@@ -14,15 +14,15 @@ body {
   width: 640px;
   display: grid;
 
-  grid-template-columns: [left] 328px [mid] 1fr [right];
-  grid-template-rows: [top] min-content [mid] 488px [bottom];
+  grid-template-columns: [left] 248px [mid] 1fr [right];
+  grid-template-rows: [top] min-content [mid] 728px [bottom];
 }
 
 .title {
   grid-column: left / right;
   grid-row: top / mid;
   font-size: 32px;
-  margin-bottom: 32px;
+  margin: 0 0 32px 0;
 }
 
 .game {
@@ -34,9 +34,10 @@ body {
 .meta {
   grid-column: mid / right;
   grid-row: mid / bottom;
+  padding-left: 32px;
 }
 
 .meta__item {
-  margin: 32px;
+  margin-bottom: 32px;
   font-size: 24px;
 }
