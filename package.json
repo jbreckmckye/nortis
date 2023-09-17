@@ -3,5 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "jbreckmckye <3148617+jbreckmckye@users.noreply.github.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "dev-web": "parcel web/index.html"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.3",
+    "typescript": "^5.2.2"
+  }
 }

@@ -1,0 +1,42 @@
+html, body {
+  font-family: monospace;
+}
+
+body {
+  background-color: black;
+  color: white;
+  padding: 32px;
+}
+
+.main {
+  margin: auto;
+  padding: 32px;
+  width: 640px;
+  display: grid;
+
+  grid-template-columns: [left] 328px [mid] 1fr [right];
+  grid-template-rows: [top] min-content [mid] 488px [bottom];
+}
+
+.title {
+  grid-column: left / right;
+  grid-row: top / mid;
+  font-size: 32px;
+  margin-bottom: 32px;
+}
+
+.game {
+  grid-column: left / mid;
+  grid-row: mid / bottom;
+  border: 4px solid white;
+}
+
+.meta {
+  grid-column: mid / right;
+  grid-row: mid / bottom;
+}
+
+.meta__item {
+  margin: 32px;
+  font-size: 24px;
+}
