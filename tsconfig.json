@@ -4,7 +4,8 @@
     "target": "es2022",
     "sourceMap": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "preact",
+    "strict": true
   },
   "exclude": [
     "node_modules"
