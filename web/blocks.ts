@@ -25,78 +25,137 @@ function rotations(count: number, shape: Shape): Shape[] {
 const blockI: Block = {
   colour: Colours.ORANGE,
   key: 'I',
-  rotations: rotations(2, [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [1, 1, 1, 1],
-    [0, 0, 0, 0]
-  ]),
-  size: 4
+  rotations: [
+    [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+    ],
+    [
+      [0, 1],
+      [0, 1],
+      [0, 1],
+      [0, 1],
+    ],
+  ]
 }
 
 const blockJ: Block = {
   colour: Colours.TURQUOISE,
   key: 'J',
-  rotations: rotations(4, [
-    [1, 0, 0],
-    [1, 1, 1],
-    [0, 0, 0],
-  ]),
-  size: 3
+  rotations: [
+    [
+      [1, 0, 0],
+      [1, 1, 1]
+    ],
+    [
+      [1, 1],
+      [1, 0],
+      [1, 0],
+    ],
+    [
+      [1, 1, 1],
+      [0, 0, 1]
+    ],
+    [
+      [0, 1],
+      [0, 1],
+      [1, 1],
+    ],
+  ],
 }
 
 const blockL: Block = {
   colour: Colours.PURPLE,
   key: 'L',
-  rotations: rotations(4, [
-    [0, 0, 0],
-    [0, 0, 1],
-    [1, 1, 1],
-  ]),
-  size: 3
+  rotations: [
+    [
+      [0, 0, 1],
+      [1, 1, 1]
+    ],
+    [
+      [1, 0],
+      [1, 0],
+      [1, 1]
+    ],
+    [
+      [1, 1, 1],
+      [1, 0, 0]
+    ],
+    [
+      [1, 1],
+      [0, 1],
+      [0, 1]
+    ]
+  ]
 }
 
 const blockO: Block = {
   colour: Colours.YELLOW,
   key: 'O',
-  rotations: rotations(1, [
-    [1, 1],
-    [1, 1]
-  ]),
-  size: 2
+  rotations: [
+    [
+      [1, 1],
+      [1, 1]
+    ]
+  ]
 }
 
 const blockS: Block = {
   colour: Colours.GREEN,
   key: 'S',
-  rotations: rotations(2, [
-    [0, 0, 0],
-    [0, 1, 1],
-    [1, 1, 0],
-  ]),
-  size: 3
+  rotations: [
+    [
+      [0, 1, 1],
+      [1, 1, 0]
+    ],
+    [
+      [1, 0],
+      [1, 1],
+      [0, 1]
+    ]
+  ]
 }
 
 const blockT: Block = {
   colour: Colours.BLUE,
   key: 'T',
-  rotations: rotations(4, [
-    [0, 0, 0],
-    [0, 1, 0],
-    [1, 1, 1],
-  ]),
-  size: 3
+  rotations: [
+    [
+      [0, 1, 0],
+      [1, 1, 1]
+    ],
+    [
+      [1, 0],
+      [1, 1],
+      [1, 0]
+    ],
+    [
+      [1, 1, 1],
+      [0, 1, 0]
+    ],
+    [
+      [0, 1],
+      [1, 1],
+      [0, 1]
+    ]
+  ]
 }
 
 const blockZ: Block = {
   colour: Colours.RED,
   key: 'Z',
-  rotations: rotations(4, [
-    [0, 0, 0],
-    [1, 1, 0],
-    [0, 1, 1],
-  ]),
-  size: 3
+  rotations: [
+    [
+      [1, 1, 0],
+      [0, 1, 1]
+    ],
+    [
+      [0, 1],
+      [1, 1],
+      [1, 0]
+    ]
+  ]
 }
 
 const selection = [

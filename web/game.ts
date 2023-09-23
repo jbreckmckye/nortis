@@ -20,8 +20,8 @@ const WIDTH = 10
  * ============================================================================
  */
 
-let field: Field = createField(HEIGHT, WIDTH)
-let playState: PlayState = {
+const field: Field = createField(HEIGHT, WIDTH)
+const playState: PlayState = {
   block: null as any,
   phase: Phase.PLAYING,
   rotation: 0,
@@ -29,6 +29,11 @@ let playState: PlayState = {
   lines: 0,
   x: 0,
   y: 0
+}
+
+;(window as any).DEBUG = {
+  field,
+  playState
 }
 
 spawn()
@@ -56,7 +61,7 @@ export function getDrawState() {
     row.forEach((cell, shapeX) => {
       const fieldX = playState.x + shapeX
       const fieldY = playState.y + shapeY
-      fieldCopy[fieldY][fieldX] = cell
+      if (cell) fieldCopy[fieldY][fieldX] = cell
     })
   })
 
@@ -71,6 +76,14 @@ export function getState() {
  * Inputs
  * ============================================================================
  */
+
+export function restart() {
+  playState.phase = Phase.PLAYING
+  playState.score = 0
+  playState.lines = 0
+  clearField()
+  spawn()
+}
 
 /**
  * Rotate the item. Is debounced but can happen multiple times per tick.
@@ -138,7 +151,7 @@ export function hardDrop() {
 export function move(movement: Movement) {
   const projectedX = playState.x + (movement === Movement.LEFT ? -1 : 1)
 
-  if (projectedX < 0 || projectedX >= WIDTH) return
+  if (projectedX >= WIDTH) return
 
   const shape = getRotationShape()
   const collision = getCollisions(shape, projectedX, playState.y)
@@ -201,18 +214,13 @@ function spawn() {
 
     case 'J':
     case 'L':
+    case 'O':
     case 'S':
     case 'T':
     case 'Z':
-      y = 1
-      break
-
-    case 'O':
       y = 2
+      break
   }
-
-  // Debugging
-  y+= 3
 
   playState.block = block
   playState.rotation = 0
@@ -231,11 +239,10 @@ function spawn() {
  */
 function commitBlock() {
   const shape = getRotationShape()
-  const shapeSize = getShapeSize()
 
-  for (let y = 0; y < shapeSize; y++) {
+  for (let y = 0; y < shape.length; y++) {
     const fieldY = playState.y + y
-    for (let x = 0; x < shapeSize; x++) {
+    for (let x = 0; x < shape[y].length; x++) {
       if (shape[y][x]) {
         const fieldX = playState.x + x
         field[fieldY][fieldX] = playState.block.colour
@@ -263,26 +270,25 @@ function clearLines(isHardDrop: boolean) {
  */
 function getDropCollision(shape: Shape, x: number, y: number) {
   for (let row = shape.length - 1; row >= 0; row--) {
-    for (const col of shape[row]) {
-      if (col) {
+    for (let col = 0; col < shape[row].length; col++) {
+      if (shape[row][col]) {
         const mappedY = y + row
         const mappedX = x + col
-        if (mappedY > HEIGHT || field[mappedY][mappedX]) {
+        if (mappedY >= HEIGHT || field[mappedY][mappedX]) {
           return Collisions.BOTTOM
         }
       }
     }
   }
+  return Collisions.NONE
 }
 
 /**
  * Get collisions for a proposed rotation shape / position
  */
 function getCollisions(shape: Shape, x: number, y: number) {
-  const blockSize = getShapeSize()
-
-  for (let row = 0; row < blockSize; row++) {
-    for (let col = 0; col < blockSize; col++) {
+  for (let row = 0; row < shape.length; row++) {
+    for (let col = 0; col < shape[row].length; col++) {
       // Check active cells for collisions
       if (shape[row][col]) {
         const mappedX = x + col
@@ -296,11 +302,10 @@ function getCollisions(shape: Shape, x: number, y: number) {
         // Check overlap
         const overlap = field[mappedY][mappedX]
         if (overlap !== Colours.NIL) return Collisions.CELL
-
-        return Collisions.NONE
       }
     }
   }
+  return Collisions.NONE
 }
 
 function isLineComplete(y: number) {
@@ -316,14 +321,18 @@ function createField(height: number, width: number): Field {
   )
 }
 
+function clearField() {
+  for (let y = 0; y < HEIGHT; y++) {
+    for (let x = 0; x < WIDTH; x++) {
+      field[y][x] = Colours.NIL
+    }
+  }
+}
+
 /**
  * State getters / setters
  * ============================================================================
  */
-
-function getShapeSize() {
-  return playState.block.size
-}
 
 function getRotationShape() {
   return playState.block.rotations[playState.rotation]
@@ -371,15 +380,8 @@ function updateGameover() {
 }
 
 function removeLine(line: number) {
-  // Scan from bottom to top, copying lines from above if we at deleted line or above
-  // If the top line is
-  for (let y = HEIGHT - 1; y >= 0; y--) {
-    if (y > line) {
-      continue
-    }
-
-    if (line === 0) {
-      // Is it ever possible to complete top hidden line?
+  for (let y = line; y >= 0; y--) {
+    if (y === 0) {
       field[0] = Array(WIDTH).fill(Colours.NIL)
     } else {
       field[y] = field[y - 1].slice()

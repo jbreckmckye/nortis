@@ -1,6 +1,11 @@
 import { colourTable } from './colours'
 import { Colours } from './types'
 
+/**
+ * Graphics code
+ * ============================================================================
+ */
+
 const PX = 24
 
 export function clearBlock(ctx: CanvasRenderingContext2D, x: number, y: number) {

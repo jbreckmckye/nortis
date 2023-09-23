@@ -6,7 +6,6 @@ export type Block = Readonly<{
   key: 'I' | 'O' | 'S' | 'Z' | 'L' | 'J' | 'T'
   colour: Colours,
   rotations: Shape[],
-  size: number
 }>
 
 export enum Colours {

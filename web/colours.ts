@@ -1,5 +1,10 @@
 import { Colours } from './types'
 
+/**
+ * Sets up colour tables
+ * ============================================================================
+ */
+
 export const colourTable = {
   [Colours.BLUE]: colours('#003dcd'),
   [Colours.GREEN]: colours('#00cd37'),
