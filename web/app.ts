@@ -1,4 +1,4 @@
-import { getDrawState, getState, hardDrop, move, restart, rotate, softDrop } from './game'
+import { getDrawState, getState, actionHardDrop, actionMoveHorizontal, actionRestart, actionRotate, actionSoftDrop } from './game'
 import { Movement, Phase } from './types'
 import { clearBlock, drawBlock } from './gfx'
 
@@ -42,7 +42,7 @@ function drawLoop() {
 
 function tick() {
   if (getState().phase === Phase.PLAYING) {
-    softDrop()
+    actionSoftDrop()
   } else {
     canvas.classList.add('dead')
     gameover.classList.remove('hidden')
@@ -55,7 +55,7 @@ window.addEventListener('keydown', (e) => {
       case 'KeyR':
         canvas.classList.remove('dead')
         gameover.classList.add('hidden')
-        return restart()
+        return actionRestart()
       default:
         return
     }
@@ -64,19 +64,19 @@ window.addEventListener('keydown', (e) => {
     switch (e.code) {
       case 'ArrowUp':
       case 'KeyW':
-        rotate()
+        actionRotate()
         break
       case 'ArrowLeft':
       case 'KeyA':
-        move(Movement.LEFT)
+        actionMoveHorizontal(Movement.LEFT)
         break
       case 'ArrowRight':
       case 'KeyD':
-        move(Movement.RIGHT)
+        actionMoveHorizontal(Movement.RIGHT)
         break
       case 'ArrowDown':
       case 'KeyS':
-        hardDrop()
+        actionHardDrop()
         break
       default:
     }

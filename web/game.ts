@@ -5,7 +5,7 @@ import { randomBlock } from './blocks'
  * Game state
  * ============================================================================
  *
- * This code is a prototype for the MacOS and PlayStation versions we will
+ * This code is a prototype for the SDL and PlayStation versions we will
  * write in C. As such we avoid using too many high-level language features,
  * and stick mostly to things we can port to C without trouble.
  */
@@ -77,11 +77,11 @@ export function getState() {
  * ============================================================================
  */
 
-export function restart() {
+export function actionRestart() {
   playState.phase = Phase.PLAYING
   playState.score = 0
   playState.lines = 0
-  clearField()
+  mutateClearField()
   spawn()
 }
 
@@ -90,7 +90,7 @@ export function restart() {
  * We will 'kick' if we touch a sideways wall.
  * Mutates PlayState
  */
-export function rotate() {
+export function actionRotate() {
   const { block, x, y } = playState
   const { key } = block
 
@@ -100,7 +100,7 @@ export function rotate() {
   const collision = getCollisions(nextShape, x, y)
 
   if (collision === Collisions.NONE) {
-    updateNextRotation()
+    mutateNextRotation()
     return
   }
 
@@ -109,8 +109,8 @@ export function rotate() {
     const direction = collision === Collisions.LEFT ? 1 : -1
     const kickedX = x + direction
     if (getCollisions(nextShape, kickedX, y) === Collisions.NONE) {
-      updateNextRotation()
-      updateX(kickedX)
+      mutateNextRotation()
+      mutateX(kickedX)
       return
     }
   }
@@ -123,12 +123,10 @@ export function rotate() {
  * Typical gravity behaviour. Moves piece down until it collides, at which point it's committed.
  * Mutates PlayState
  */
-export function softDrop() {
+export function actionSoftDrop() {
   const collision = downOne()
   if (collision !== Collisions.NONE) {
-    commitBlock()
-    clearLines(false)
-    spawn()
+    commitPiece(false)
   }
 }
 
@@ -136,19 +134,16 @@ export function softDrop() {
  * Forced gravity. Pushes piece down N times until it can be committed.
  * Mutates PlayState.
  */
-export function hardDrop() {
+export function actionHardDrop() {
   downMany()
-  commitBlock()
-  clearLines(true)
-  spawn()
+  commitPiece(true)
 }
-
 
 /**
  * Move left/right
  * Updates PlayState
  */
-export function move(movement: Movement) {
+export function actionMoveHorizontal(movement: Movement) {
   const projectedX = playState.x + (movement === Movement.LEFT ? -1 : 1)
 
   if (projectedX >= WIDTH) return
@@ -156,7 +151,7 @@ export function move(movement: Movement) {
   const shape = getRotationShape()
   const collision = getCollisions(shape, projectedX, playState.y)
   if (collision === Collisions.NONE) {
-    updateX(projectedX)
+    mutateX(projectedX)
   }
 }
 
@@ -165,41 +160,22 @@ export function move(movement: Movement) {
  * ============================================================================
  */
 
-/**
- * Basic piece gravity movement
- * Mutates PlayState.y
- */
-function downOne(): Collisions {
-  const { x, y } = playState
-
+function commitPiece(isHardDrop: boolean) {
   const shape = getRotationShape()
-  const projectedY = y + 1
+  mutateField(playState.x, playState.y, shape)
 
-  const collision = getDropCollision(shape, x, projectedY)
-  if (collision === Collisions.NONE) {
-    updateY(projectedY)
+  const clearedLines = clearLines()
+  if (clearedLines) {
+    mutateLineScore(clearedLines, isHardDrop)
   }
 
-  return collision
-}
-
-/**
- * Hard drop gravity movement
- * Mutates PlayState.y
- */
-function downMany() {
-  let collision: Collisions = Collisions.NONE
-  while (collision === Collisions.NONE) {
-    collision = downOne()
+  const spawnCollision = spawn()
+  if (spawnCollision !== Collisions.NONE) {
+    mutateGameover()
   }
 }
 
-/**
- * Creating a new piece.
- * Will occur tick after a piece is committed.
- * Mutates PlayState.
- */
-function spawn() {
+function spawn(): Collisions {
   const block = randomBlock()
   const shape = block.rotations[0]
 
@@ -227,42 +203,49 @@ function spawn() {
   playState.x = x
   playState.y = y
 
-  // If a spawned piece collides, the game is lost
-  if (getDropCollision(shape, x, y) !== Collisions.NONE) {
-    updateGameover()
+  return getDropCollision(shape, x, y)
+}
+
+/**
+ * Basic piece gravity movement
+ */
+function downOne(): Collisions {
+  const { x, y } = playState
+
+  const shape = getRotationShape()
+  const projectedY = y + 1
+
+  const collision = getDropCollision(shape, x, projectedY)
+  if (collision === Collisions.NONE) {
+    mutateY(projectedY)
+  }
+
+  return collision
+}
+
+/**
+ * Hard drop gravity movement
+ */
+function downMany() {
+  let collision: Collisions = Collisions.NONE
+  while (collision === Collisions.NONE) {
+    collision = downOne()
   }
 }
 
 /**
- * Occurs when gravity has forced a piece to collide. Now is added to the board.
- * Mutates Field, PlayState.
+ * Clear any complete lines, returns no cleared
  */
-function commitBlock() {
-  const shape = getRotationShape()
-
-  for (let y = 0; y < shape.length; y++) {
-    const fieldY = playState.y + y
-    for (let x = 0; x < shape[y].length; x++) {
-      if (shape[y][x]) {
-        const fieldX = playState.x + x
-        field[fieldY][fieldX] = playState.block.colour
-      }
-    }
-  }
-}
-
-function clearLines(isHardDrop: boolean) {
+function clearLines(): number {
   let cleared = 0
   for (let line = 0; line < HEIGHT; line++) {
     if (isLineComplete(line)) {
-      removeLine(line)
+      mutateDroppedLines(line)
       cleared++
     }
   }
 
-  if (cleared) {
-    updateLineScore(cleared, isHardDrop)
-  }
+  return cleared
 }
 
 /**
@@ -308,12 +291,12 @@ function getCollisions(shape: Shape, x: number, y: number) {
   return Collisions.NONE
 }
 
-function isLineComplete(y: number) {
-  for (const cell of field[y]) {
-    if (!cell) return false
-  }
-  return true
-}
+
+
+/**
+ * Field functions
+ * ============================================================================
+ */
 
 function createField(height: number, width: number): Field {
   return arrayOf(null, height).map(
@@ -321,12 +304,31 @@ function createField(height: number, width: number): Field {
   )
 }
 
-function clearField() {
+function mutateClearField() {
   for (let y = 0; y < HEIGHT; y++) {
     for (let x = 0; x < WIDTH; x++) {
       field[y][x] = Colours.NIL
     }
   }
+}
+
+function mutateField(shapeX: number, shapeY: number, shapeToCopy: Shape) {
+  for (let y = 0; y < shapeToCopy.length; y++) {
+    const fieldY = shapeY + y
+    for (let x = 0; x < shapeToCopy[y].length; x++) {
+      if (shapeToCopy[y][x]) {
+        const fieldX = shapeX + x
+        field[fieldY][fieldX] = playState.block.colour
+      }
+    }
+  }
+}
+
+function isLineComplete(y: number) {
+  for (const cell of field[y]) {
+    if (!cell) return false
+  }
+  return true
 }
 
 /**
@@ -346,19 +348,19 @@ function getNextRotationShape() {
   return playState.block.rotations[getNextRotation()]
 }
 
-function updateX(x: number) {
+function mutateX(x: number) {
   playState.x = x
 }
 
-function updateY(y: number) {
+function mutateY(y: number) {
   playState.y = y
 }
 
-function updateNextRotation() {
+function mutateNextRotation() {
   playState.rotation = getNextRotation()
 }
 
-function updateLineScore(linesCleared: number, isHardDrop: boolean) {
+function mutateLineScore(linesCleared: number, isHardDrop: boolean) {
   playState.lines += linesCleared
   switch (linesCleared) {
     case 1:
@@ -375,12 +377,12 @@ function updateLineScore(linesCleared: number, isHardDrop: boolean) {
   }
 }
 
-function updateGameover() {
+function mutateGameover() {
   playState.phase = Phase.GAMEOVER
 }
 
-function removeLine(line: number) {
-  for (let y = line; y >= 0; y--) {
+function mutateDroppedLines(droppedLine: number) {
+  for (let y = droppedLine; y >= 0; y--) {
     if (y === 0) {
       field[0] = Array(WIDTH).fill(Colours.NIL)
     } else {
@@ -388,6 +390,11 @@ function removeLine(line: number) {
     }
   }
 }
+
+/**
+ * Utils
+ * ============================================================================
+ */
 
 function arrayOf<T>(value: T, size: number) {
   return new Array(size).fill(value)
