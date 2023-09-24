@@ -5,7 +5,8 @@
   "author": "jbreckmckye <3148617+jbreckmckye@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
-    "dev-web": "parcel web/index.html"
+    "dev-web": "parcel web/index.html",
+    "build-c": "gcc Hello c/hello.c"
   },
   "devDependencies": {
     "parcel": "^2.9.3",
