@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev-web": "parcel web/index.html",
-    "build-c": "gcc Hello c/hello.c"
+    "build-c": "gcc -o notris.out -Wall c/hello.c `sdl2-config --libs` -lm -lSDL2_ttf",
+    "run-c": "./notris.out"
   },
   "devDependencies": {
     "parcel": "^2.9.3",

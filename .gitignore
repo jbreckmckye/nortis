@@ -2,3 +2,6 @@
 .parcel-cache
 dist
 node_modules
+
+# C program
+*.out
