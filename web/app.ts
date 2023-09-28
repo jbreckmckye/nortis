@@ -1,4 +1,4 @@
-import { getDrawState, getState, actionHardDrop, actionMoveHorizontal, actionRestart, actionRotate, actionSoftDrop } from './game'
+import { getDrawState, getLevelSpeed, getState, actionHardDrop, actionMoveHorizontal, actionRestart, actionRotate, actionSoftDrop } from './game'
 import { Movement, Phase } from './types'
 import { clearBlock, drawBlock } from './gfx'
 
@@ -17,7 +17,7 @@ const ctx = canvas.getContext('2d')
  */
 
 drawLoop()
-window.setInterval(tick, 500)
+tick()
 
 function drawLoop() {
   const rows = getDrawState()
@@ -47,6 +47,7 @@ function tick() {
     canvas.classList.add('dead')
     gameover.classList.remove('hidden')
   }
+  window.setTimeout(tick, getLevelSpeed())
 }
 
 window.addEventListener('keydown', (e) => {

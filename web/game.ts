@@ -72,6 +72,11 @@ export function getState() {
   return playState as Readonly<PlayState>
 }
 
+export function getLevelSpeed() {
+  const level = Math.min(playState.lines % 10, 10)
+  return 1000 - (level * 77)
+}
+
 /**
  * Inputs
  * ============================================================================
