@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev-web": "parcel web/index.html",
-    "build-c": "gcc -o notris.out -Wall c/hello.c `sdl2-config --libs` -lm -lSDL2_ttf",
-    "run-c": "./notris.out"
+    "build-macos": "gcc -o notris.out -Wall macos/hello.c `sdl2-config --libs` -lm -lSDL2_ttf",
+    "run-macos": "MallocStackLogging=1 && ./notris.out"
   },
   "devDependencies": {
     "parcel": "^2.9.3",
