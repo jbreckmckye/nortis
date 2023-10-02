@@ -1,0 +1,55 @@
+#include <stdlib.h>
+#include <assert.h>
+#include "defs.h"
+#include "blocks.h"
+
+/**
+ * blocks.c
+ * ================================================================================================
+ * Blocks are stored using a hex number scheme described in https://stackoverflow.com/a/38596291,
+ * of 16 bits (4 by 4 rows).  This allows us to very compactly define custom rotation systems.
+ * 
+ * Bits can be addressed by masking from 0x8000 (GRID_BIT_OFFSET) for the first bit, then shifting
+ * for subsequent bits.
+ * ================================================================================================
+ */
+
+static shapeHex shapeHexes[7][4] = {
+  { 0x4444, 0x0F00, 0x4444, 0x0F00 }, // I
+  { 0x44C0, 0x8E00, 0xC880, 0xE200 }, // J
+  { 0x88C0, 0xE800, 0xC440, 0x2E00 }, // L
+  { 0xCC00, 0xCC00, 0xCC00, 0xCC00 }, // O
+  { 0x8C40, 0x6C00, 0x8C40, 0x6C00 }, // S
+  { 0x4640, 0x0E40, 0x4C40, 0x4E00 }, // T
+  { 0x4C80, 0xC600, 0x4C80, 0xC600 }, // Z
+};
+
+int getShapeBit(shapeHex s, int y, int x) {
+  int mask = GRID_BIT_OFFSET >> ((y * 4) + x);
+  return s & mask;
+}
+
+rotationIndex getNextRotation(int r) {
+  return (r + 1) % 4;
+}
+
+shapeHex getBlockShape(BlockNames key, rotationIndex r) {
+  assert(key >= 0 && key < 7);
+  assert(r >= 0 && r < 4);
+
+  return shapeHexes[key][r];
+}
+
+BlockColours getBlockColour(BlockNames key) {
+  return key + 1;
+}
+
+/**
+ * Randomisation
+ * ================================================================================================
+ */
+
+BlockNames randomBlock() {
+  // Not truly random (has skew) but probably fine for a game
+  return rand() % 7;
+}

@@ -2,16 +2,29 @@
 #define HEIGHT 26
 #define HIDDEN_ROWS 2
 
-enum Game_Colours {
+#define GRID_BIT_OFFSET 0x8000
+
+// This MUST map to NIL + an item per BlockName
+typedef enum BlockColours {
   NIL,
-  BLUE,
+  ORANGE,
   GREEN,
-  RED,
-  YELLOW,
   PURPLE,
+  YELLOW,
+  RED,
+  BLUE,
   AQUA,
-  ORANGE 
-};
+} BlockColours;
+
+typedef enum BlockNames {
+  BLOCK_I,
+  BLOCK_J,
+  BLOCK_L,
+  BLOCK_O,
+  BLOCK_S,
+  BLOCK_T,
+  BLOCK_Z
+} BlockNames;
 
 enum Game_States {
   PLAYING,
@@ -30,11 +43,3 @@ enum Game_Collisions {
   COLLIDE_BOTTOMWALL,
   COLLIDE_CELL
 };
-
-struct Game_Piece {
-  PlayBlock block;
-  int rotation;
-  int x;
-  int y;
-} typedef Game_Piece;
-
