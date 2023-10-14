@@ -4,7 +4,7 @@
 
 #define GRID_BIT_OFFSET 0x8000
 
-// This MUST map to NIL + an item per BlockName
+// These are coupled so that each BlockName -> BlockColour
 typedef enum BlockColours {
   NIL,
   ORANGE,
@@ -17,7 +17,7 @@ typedef enum BlockColours {
 } BlockColours;
 
 typedef enum BlockNames {
-  BLOCK_I,
+  BLOCK_I = 1, // -> ORANGE
   BLOCK_J,
   BLOCK_L,
   BLOCK_O,

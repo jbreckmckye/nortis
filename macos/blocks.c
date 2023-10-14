@@ -10,7 +10,25 @@
  * of 16 bits (4 by 4 rows).  This allows us to very compactly define custom rotation systems.
  * 
  * Bits can be addressed by masking from 0x8000 (GRID_BIT_OFFSET) for the first bit, then shifting
- * for subsequent bits.
+ * right for subsequent bits.
+ * 
+ * Example:
+ * 
+ * A 2x2 block translated into bits
+ * 
+ * XX.. -> 1100
+ * XX.. -> 1100
+ * .... -> 0000
+ * .... -> 0000
+ * 
+ * binary= 0b1100110000000000
+ * hexdml= 0xCC00
+ * 
+ * To get row 1 = 0xCC00 & (0x0F00)
+ *        row 2 = 0xCC00 & (0x0F00 >> 1)
+ *        etc.
+ * 
+ * Or to get x/y = 0xCC00 & (0x8000 >> ((y * 4) + x))
  * ================================================================================================
  */
 
@@ -41,7 +59,7 @@ shapeHex getBlockShape(BlockNames key, rotationIndex r) {
 }
 
 BlockColours getBlockColour(BlockNames key) {
-  return key + 1;
+  return key;
 }
 
 /**

@@ -8,7 +8,6 @@
  * Just using this to learn the ropes :-)
  */
 
-
 const int WIDTH = 640;
 const int HEIGHT = 480;
 const char* FONT_PATH = "macos/IBMPlexMono-SemiBold.ttf";

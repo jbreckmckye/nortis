@@ -3,7 +3,8 @@
 typedef int shapeHex;
 typedef int rotationIndex;
 
-int getShapeBit(shapeHex s);
+int getShapeBit(shapeHex s, int y, int x);
+
 rotationIndex getNextRotation(int r);
 shapeHex getBlockShape(BlockNames key, rotationIndex r);
 BlockColours getBlockColour(BlockNames key);
