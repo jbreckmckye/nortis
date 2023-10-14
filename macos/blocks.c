@@ -58,10 +58,6 @@ shapeHex getBlockShape(BlockNames key, rotationIndex r) {
   return shapeHexes[key][r];
 }
 
-BlockColours getBlockColour(BlockNames key) {
-  return key;
-}
-
 /**
  * Randomisation
  * ================================================================================================

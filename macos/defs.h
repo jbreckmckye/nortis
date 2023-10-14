@@ -4,20 +4,8 @@
 
 #define GRID_BIT_OFFSET 0x8000
 
-// These are coupled so that each BlockName -> BlockColour
-typedef enum BlockColours {
-  NIL,
-  ORANGE,
-  GREEN,
-  PURPLE,
-  YELLOW,
-  RED,
-  BLUE,
-  AQUA,
-} BlockColours;
-
 typedef enum BlockNames {
-  BLOCK_I = 1, // -> ORANGE
+  BLOCK_I,
   BLOCK_J,
   BLOCK_L,
   BLOCK_O,
