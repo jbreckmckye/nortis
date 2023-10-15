@@ -8,6 +8,7 @@ struct ColourPalette {
 } typedef ColourPalette;
 
 SDL_Color colours_black;
+SDL_Color colours_offWhite;
 
 ColourPalette colours_blue;
 ColourPalette colours_green;

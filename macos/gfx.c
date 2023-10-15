@@ -3,18 +3,32 @@
 
 #include "colours.h"
 
+/*
+ * Constants
+ * ============================================================================ 
+ */
+
 static const int FIELD_WIDTH = WIDTH * BLOCK_SIZE;
 static const int FIELD_HEIGHT = HEIGHT * (BLOCK_SIZE - HIDDEN_ROWS);
-// static const int BORDER_WIDTH = 4;
 
 static const int WINDOW_HEIGHT = FIELD_HEIGHT + (2 * SIZE_PADDING);
-static const int WINDOW_WIDTH = (3 * FIELD_WIDTH) + (2 * SIZE_PADDING);
+static const int WINDOW_WIDTH = (2 * FIELD_WIDTH) + (2 * SIZE_PADDING);
 
 static const char* FONT_PATH = "IBMPlexMono-SemiBold.ttf";
+
+/*
+ * Shared references
+ * ============================================================================ 
+ */
 
 static SDL_Window* p_window = NULL;
 static SDL_Renderer* p_renderer = NULL;
 static TTF_Font* p_font = NULL;
+
+/*
+ * Initialisation
+ * ============================================================================ 
+ */
 
 static bool initSDL() {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -62,6 +76,50 @@ static bool initFont() {
   return true;
 }
 
+static void drawFrame() {
+  SDL_SetRenderDrawColor(
+    p_renderer,
+    colours_offWhite.r,
+    colours_offWhite.g,
+    colours_offWhite.b,
+    colours_offWhite.a
+  );
+
+  int hlineWidth = FIELD_WIDTH + (2 * SIZE_BORDER);
+  int vlineHeight = FIELD_HEIGHT + (2 * SIZE_BORDER);
+  int fieldBottom = SIZE_PADDING + SIZE_BORDER + FIELD_HEIGHT;
+  int fieldRight = SIZE_PADDING + SIZE_BORDER + FIELD_WIDTH;
+
+  SDL_Rect topLine = {
+    SIZE_PADDING, SIZE_PADDING, // x/y
+    hlineWidth,   SIZE_BORDER,  // w/h
+  };
+  SDL_RenderFillRect(p_renderer, &topLine);
+
+  SDL_Rect leftLine = {
+    SIZE_PADDING, SIZE_PADDING, // x/y
+    SIZE_BORDER,  vlineHeight   // w/h
+  };
+  SDL_RenderFillRect(p_renderer, &leftLine);
+
+  SDL_Rect bottomLine = {
+    SIZE_PADDING, fieldBottom, // x/y
+    hlineWidth,   SIZE_BORDER  // w/h
+  };
+  SDL_RenderFillRect(p_renderer, &bottomLine);
+
+  SDL_Rect rightLine = {
+    fieldRight,  SIZE_PADDING, // x/y
+    SIZE_BORDER, vlineHeight   // w/h
+  };
+  SDL_RenderFillRect(p_renderer, &rightLine);
+}
+
+/*
+ * Public
+ * ============================================================================ 
+ */
+
 bool gfx_init() {
   return initSDL() && initFont();
 }
@@ -83,5 +141,6 @@ void gfx_drawDebug() {
   SDL_Color bkg = colours_blue.dark;
   SDL_SetRenderDrawColor(p_renderer, bkg.r, bkg.g, bkg.b, bkg.a);
   SDL_RenderFillRect(p_renderer, NULL);
+  drawFrame();
   SDL_RenderPresent(p_renderer);
 }

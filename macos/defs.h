@@ -5,6 +5,7 @@
 #define BLOCK_SIZE 24
 #define HIDDEN_ROWS 2
 #define SIZE_PADDING 32
+#define SIZE_BORDER 4
 
 #define GRID_BIT_OFFSET 0x8000
 
