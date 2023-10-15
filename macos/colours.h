@@ -7,14 +7,14 @@ struct ColourPalette {
   SDL_Color dark;
 } typedef ColourPalette;
 
-SDL_Color black;
+SDL_Color colours_black;
 
-ColourPalette paletteBlue;
-ColourPalette paletteGreen;
-ColourPalette paletteRed;
-ColourPalette paletteOrange;
-ColourPalette palettePurple;
-ColourPalette paletteTurquoise;
-ColourPalette paletteYellow;
+ColourPalette colours_blue;
+ColourPalette colours_green;
+ColourPalette colours_red;
+ColourPalette colours_orange;
+ColourPalette colours_purple;
+ColourPalette colours_turquoise;
+ColourPalette colours_yellow;
 
-SDL_Color blockColourMain (BlockNames block);
+ColourPalette* colours_blockPalette (BlockNames blockKey);

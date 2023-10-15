@@ -41,3 +41,5 @@ gcc hello.c `sdl2-config --libs` -lm -lSDL2_ttf
 - subshell for `sdl2-config --libs` generates handy linker arguments `-L/usr/local/lib -lSDL2`
 - `-lm` links the math library
 - `lX` links a library by name
+
+Set MallocStackLogging to use `leaks` cmd

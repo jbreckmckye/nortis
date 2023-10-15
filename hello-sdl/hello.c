@@ -10,7 +10,7 @@
 
 const int WIDTH = 640;
 const int HEIGHT = 480;
-const char* FONT_PATH = "macos/IBMPlexMono-SemiBold.ttf";
+const char* FONT_PATH = "IBMPlexMono-SemiBold.ttf";
 
 SDL_Window* window = NULL;
 // See previous commit for software renderer version using SDL_Surface

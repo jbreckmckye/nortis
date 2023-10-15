@@ -1,59 +1,59 @@
 #include "colours.h"
 
-SDL_Color black = {0x00, 0x00, 0x00, 0xFF};
+SDL_Color colours_black = {0x00, 0x00, 0x00, 0xFF};
 
-ColourPalette paletteBlue = {
+ColourPalette colours_blue = {
   {0x00, 0x3D, 0xCD, 0xFF},
   {0x0B, 0x54, 0xFF, 0xFF},
   {0x00, 0x2B, 0x90, 0xFF}
 };
 
-ColourPalette paletteGreen = {
+ColourPalette colours_green = {
   {0x00, 0xCD, 0x37, 0xFF},
   {0x0B, 0xFF, 0x4D, 0xFF},
   {0x00, 0x90, 0x27, 0xFF},
 };
 
-ColourPalette paletteRed = {
+ColourPalette colours_red = {
   {0xCD, 0x00, 0x30, 0xFF},
   {0xFF, 0x0B, 0x45, 0xFF},
   {0x90, 0x00, 0x22, 0xFF}
 };
 
-ColourPalette paletteOrange = {
+ColourPalette colours_orange = {
   {0xDF, 0x85, 0x00, 0xFF},
   {0xFF, 0xA6, 0x23, 0xFF},
   {0x9C, 0x5D, 0x00, 0xFF}
 };
 
-ColourPalette palettePurple = {
+ColourPalette colours_purple = {
   {0x89, 0x00, 0xCD, 0xFF},
   {0xAE, 0x0B, 0xFF, 0xFF},
   {0x60, 0x00, 0x90, 0xFF}
 };
 
-ColourPalette paletteTurqoise = {
+ColourPalette colours_turqoise = {
   {0x00, 0xCD, 0xC3, 0xFF},
   {0x0B, 0xFF, 0xF3, 0xFF},
   {0x00, 0x90, 0x88, 0xFF}
 };
 
-ColourPalette paletteYellow = {
+ColourPalette colours_yellow = {
   {0xD8, 0xD2, 0x00, 0xFF},
   {0xFF, 0xF9, 0x1A, 0xFF},
   {0x97, 0x93, 0x00, 0xFF}
 };
 
-ColourPalette* blockColours (BlockNames blockKey) {
+ColourPalette* colours_blockPalette (BlockNames blockKey) {
   switch (blockKey) {
-    case BLOCK_I: return &paletteOrange;
-    case BLOCK_J: return &paletteGreen;
-    case BLOCK_L: return &palettePurple;
-    case BLOCK_O: return &paletteYellow;
-    case BLOCK_S: return &paletteRed;
-    case BLOCK_T: return &paletteBlue;
+    case BLOCK_I: return &colours_orange;
+    case BLOCK_J: return &colours_green;
+    case BLOCK_L: return &colours_purple;
+    case BLOCK_O: return &colours_yellow;
+    case BLOCK_S: return &colours_red;
+    case BLOCK_T: return &colours_blue;
     case BLOCK_Z:
     default:
-      return &paletteTurquoise;
+      return &colours_turqoise;
   }
 }

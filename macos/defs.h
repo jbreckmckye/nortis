@@ -1,6 +1,10 @@
+#include <stdbool.h>
+
 #define WIDTH 10
 #define HEIGHT 26
+#define BLOCK_SIZE 24
 #define HIDDEN_ROWS 2
+#define SIZE_PADDING 32
 
 #define GRID_BIT_OFFSET 0x8000
 
@@ -14,20 +18,35 @@ typedef enum BlockNames {
   BLOCK_Z
 } BlockNames;
 
-enum Game_States {
+typedef enum PlayStates {
   PLAYING,
   GAMEOVER
-};
+} PlayStates;
 
-enum Game_Movements {
+typedef enum PlayMovements {
   MOVELEFT,
   MOVERIGHT
-};
+} PlayMovements;
 
-enum Game_Collisions {
+enum GameCollisions {
   COLLIDE_NONE,
   COLLIDE_LEFTWALL,
   COLLIDE_RIGHTWALL,
   COLLIDE_BOTTOMWALL,
   COLLIDE_CELL
 };
+
+typedef bool Field[HEIGHT][WIDTH];
+
+struct GameState {
+  BlockNames blockName;
+  int blockRotation;
+  int clearedLines;
+  int dropDelay;
+  Field *p_field;
+  int points;
+  int positionX;
+  int positionY;
+  PlayStates playState;
+} typedef GameState;
+
