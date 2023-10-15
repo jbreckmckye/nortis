@@ -76,43 +76,60 @@ static bool initFont() {
   return true;
 }
 
-static void drawFrame() {
+// static void drawBlock(ColourPalette *p_palette, int posX, int posY) {
+// }
+
+static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int thickness) {
   SDL_SetRenderDrawColor(
     p_renderer,
-    colours_offWhite.r,
-    colours_offWhite.g,
-    colours_offWhite.b,
-    colours_offWhite.a
+    p_colour->r,
+    p_colour->g,
+    p_colour->b,
+    p_colour->a
   );
 
-  int hlineWidth = FIELD_WIDTH + (2 * SIZE_BORDER);
-  int vlineHeight = FIELD_HEIGHT + (2 * SIZE_BORDER);
-  int fieldBottom = SIZE_PADDING + SIZE_BORDER + FIELD_HEIGHT;
-  int fieldRight = SIZE_PADDING + SIZE_BORDER + FIELD_WIDTH;
+  bool isOuter = thickness < 0;
+  int size = isOuter ? (thickness * -1) : thickness;
 
-  SDL_Rect topLine = {
-    SIZE_PADDING, SIZE_PADDING, // x/y
-    hlineWidth,   SIZE_BORDER,  // w/h
-  };
-  SDL_RenderFillRect(p_renderer, &topLine);
+  int boxWidth = x2 - x1;
+  int boxHeight = y2 - y1;
 
-  SDL_Rect leftLine = {
-    SIZE_PADDING, SIZE_PADDING, // x/y
-    SIZE_BORDER,  vlineHeight   // w/h
+  // Horizontal line - top
+  SDL_Rect hline = { // x,y,w,h
+    isOuter ? x1 - size : x1,
+    isOuter ? y1 - size : y1,
+    isOuter ? boxWidth + (size * 2) : boxWidth,
+    size
   };
-  SDL_RenderFillRect(p_renderer, &leftLine);
+  SDL_RenderFillRect(p_renderer, &hline);
 
-  SDL_Rect bottomLine = {
-    SIZE_PADDING, fieldBottom, // x/y
-    hlineWidth,   SIZE_BORDER  // w/h
-  };
-  SDL_RenderFillRect(p_renderer, &bottomLine);
+  // Horizontal line - bottom
+  hline.y = isOuter ? y2 : (y2 - size);
+  SDL_RenderFillRect(p_renderer, &hline);
 
-  SDL_Rect rightLine = {
-    fieldRight,  SIZE_PADDING, // x/y
-    SIZE_BORDER, vlineHeight   // w/h
+  // Vertical line - left
+  SDL_Rect vline = { //x,y,w,h
+    isOuter ? x1 - size : x1,
+    isOuter ? y1 - size : y1,
+    size,
+    isOuter ? boxHeight + (size * 2) : boxHeight
   };
-  SDL_RenderFillRect(p_renderer, &rightLine);
+  SDL_RenderFillRect(p_renderer, &vline);
+
+  // Vertical line - right
+  vline.x = isOuter ? x2 : (x2 - size);
+  SDL_RenderFillRect(p_renderer, &vline);
+}
+
+static void drawFrame() {
+  drawBorder(
+    &colours_offWhite,
+    SIZE_PADDING,
+    SIZE_PADDING,
+    SIZE_PADDING + FIELD_WIDTH,
+    SIZE_PADDING + FIELD_HEIGHT,
+    SIZE_BORDER * -1
+  );
 }
 
 /*
