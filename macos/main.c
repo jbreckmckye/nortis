@@ -1,10 +1,13 @@
 #include "gfx.h"
 
-int main(int argc, char* args[]) {
-  printf("Start");
+int main(int argc, char* argv[]) {
+  printf("Start\n");
+
+  // Ignore unused args
+  (void) argv[argc - 1];
 
   if (gfx_init() == false) {
-    printf("Startup failed, exiting");
+    printf("Startup failed, exiting\n");
     gfx_cleanup();
     return 1;
   }
@@ -22,7 +25,7 @@ int main(int argc, char* args[]) {
     }
   }
 
-  printf("Quit");
+  printf("Quit\n");
   gfx_cleanup();
   return 0;
 }

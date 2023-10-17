@@ -8,7 +8,7 @@
     "dev-web": "parcel web/index.html",
     "build-hello": "gcc -o hello.out -Wall hello-sdl/hello.c `sdl2-config --libs` -lm -lSDL2_ttf",
     "run-hello": "MallocStackLogging=1 && ./hello.out",
-    "build-macos": "gcc -o notris.out -Wall macos/*.c `sdl2-config --libs` -lm -lSDL2_ttf",
+    "build-macos": "gcc -o notris.out -Wall -Wextra -Wpedantic macos/*.c `sdl2-config --libs` -lm -lSDL2_ttf",
     "run-macos": "MallocStackLogging=1 && ./notris.out"
   },
   "devDependencies": {
