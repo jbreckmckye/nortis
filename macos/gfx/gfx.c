@@ -236,6 +236,11 @@ void gfx_cleanup() {
 }
 
 void gfx_drawDebug() {
+  // "You are strongly encouraged to call SDL_RenderClear() to initialise the backbuffer
+  //  before starting each new frame's drawing, even if you plan to overwrite every pixel"
+  // "...Do not assume that previous contents will exist betwen frames"
+  SDL_RenderClear(p_renderer);
+
   SDL_Color bkg = colours_black;
 
   // bkg

@@ -1,3 +1,4 @@
+// Helps with generating hardcoded SDL_Color structs
 // Run on https://npm.runkit.com/color
 
 var color = require("color")
