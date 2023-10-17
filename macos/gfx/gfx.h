@@ -1,7 +1,5 @@
 #include "SDL2/SDL.h"
-#include "defs.h"
-
-//int draw(GameState *p_gameState);
+#include "../defs.h"
 
 bool gfx_init();
 void gfx_cleanup();

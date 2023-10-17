@@ -1,3 +1,7 @@
+// Once-only wrapper
+#ifndef DEFS_H_SEEN
+#define DEFS_H_SEEN
+
 #include <stdbool.h>
 
 #define WIDTH 10
@@ -10,7 +14,7 @@
 #define GRID_BIT_OFFSET 0x8000
 
 typedef enum BlockNames {
-  BLOCK_I,
+  BLOCK_I = 1,
   BLOCK_J,
   BLOCK_L,
   BLOCK_O,
@@ -24,10 +28,10 @@ typedef enum PlayStates {
   GAMEOVER
 } PlayStates;
 
-typedef enum PlayMovements {
+typedef enum GameMovements {
   MOVELEFT,
   MOVERIGHT
-} PlayMovements;
+} GameMovements;
 
 enum GameCollisions {
   COLLIDE_NONE,
@@ -37,7 +41,7 @@ enum GameCollisions {
   COLLIDE_CELL
 };
 
-typedef bool Field[HEIGHT][WIDTH];
+typedef int Field[HEIGHT][WIDTH];
 
 struct GameState {
   BlockNames blockName;
@@ -58,3 +62,6 @@ typedef enum BorderFlags {
   BORDER_RIGHT = 8,
   BORDER_ALL = 15
 } BorderFlags;
+
+// Once-only wrapper
+#endif // DEFS_H_SEEN

@@ -73,7 +73,7 @@ export function getState() {
 }
 
 export function getLevelSpeed() {
-  const level = Math.min(playState.lines % 10, 10)
+  const level = Math.max(playState.lines / 10, 10)
   return 1000 - (level * 77)
 }
 

@@ -1,5 +1,5 @@
 #include "SDL2/SDL.h"
-#include "defs.h"
+#include "../defs.h"
 
 struct ColourPalette {
   SDL_Color main;
