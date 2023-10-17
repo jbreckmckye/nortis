@@ -76,10 +76,12 @@ static bool initFont() {
   return true;
 }
 
-// static void drawBlock(ColourPalette *p_palette, int posX, int posY) {
-// }
+/*
+ * Drawing
+ * ============================================================================ 
+ */
 
-static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int thickness) {
+static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int thickness, BorderFlags borders) {
   SDL_SetRenderDrawColor(
     p_renderer,
     p_colour->r,
@@ -101,11 +103,11 @@ static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int 
     isOuter ? boxWidth + (size * 2) : boxWidth,
     size
   };
-  SDL_RenderFillRect(p_renderer, &hline);
+  if (borders & BORDER_TOP) SDL_RenderFillRect(p_renderer, &hline);
 
   // Horizontal line - bottom
   hline.y = isOuter ? y2 : (y2 - size);
-  SDL_RenderFillRect(p_renderer, &hline);
+  if (borders & BORDER_BOTTOM) SDL_RenderFillRect(p_renderer, &hline);
 
   // Vertical line - left
   SDL_Rect vline = { //x,y,w,h
@@ -114,11 +116,52 @@ static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int 
     size,
     isOuter ? boxHeight + (size * 2) : boxHeight
   };
-  SDL_RenderFillRect(p_renderer, &vline);
+  if (borders & BORDER_LEFT) SDL_RenderFillRect(p_renderer, &vline);
 
   // Vertical line - right
   vline.x = isOuter ? x2 : (x2 - size);
-  SDL_RenderFillRect(p_renderer, &vline);
+  if (borders & BORDER_RIGHT) SDL_RenderFillRect(p_renderer, &vline);
+}
+
+static void drawBlock(ColourPalette *p_palette, int posX, int posY) {
+  const int borderWidth = 2;
+
+  SDL_SetRenderDrawColor(
+    p_renderer,
+    p_palette->main.r,
+    p_palette->main.g,
+    p_palette->main.b,
+    p_palette->main.a
+  );
+
+  SDL_Rect block = {
+    .x = SIZE_PADDING + (posX * BLOCK_SIZE),
+    .y = SIZE_PADDING + (posY * BLOCK_SIZE),
+    .h = BLOCK_SIZE,
+    .w = BLOCK_SIZE
+  };
+
+  SDL_RenderFillRect(p_renderer, &block);
+
+  drawBorder(
+    &(p_palette->dark),
+    block.x,
+    block.y,
+    block.x + block.w,
+    block.y + block.h,
+    borderWidth,
+    BORDER_BOTTOM + BORDER_RIGHT
+  );
+
+  drawBorder(
+    &(p_palette->light),
+    block.x,
+    block.y,
+    block.x + block.w,
+    block.y + block.h,
+    borderWidth,
+    BORDER_TOP + BORDER_LEFT
+  );
 }
 
 static void drawFrame() {
@@ -128,7 +171,8 @@ static void drawFrame() {
     SIZE_PADDING,
     SIZE_PADDING + FIELD_WIDTH,
     SIZE_PADDING + FIELD_HEIGHT,
-    SIZE_BORDER * -1
+    SIZE_BORDER * -1,
+    BORDER_ALL
   );
 }
 
@@ -155,9 +199,23 @@ void gfx_cleanup() {
 }
 
 void gfx_drawDebug() {
-  SDL_Color bkg = colours_blue.dark;
+  SDL_Color bkg = colours_black;
+
+  // bkg
   SDL_SetRenderDrawColor(p_renderer, bkg.r, bkg.g, bkg.b, bkg.a);
   SDL_RenderFillRect(p_renderer, NULL);
+
+  // frame
   drawFrame();
+
+  // block
+  drawBlock(&colours_blue, 0, 2);
+  drawBlock(&colours_blue, 1, 2);
+  drawBlock(&colours_blue, 2, 2);
+  drawBlock(&colours_blue, 1, 1);
+
+  drawBlock(&colours_orange, 9, 0);
+
+  // flip buffer
   SDL_RenderPresent(p_renderer);
 }

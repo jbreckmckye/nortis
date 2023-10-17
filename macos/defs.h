@@ -51,3 +51,10 @@ struct GameState {
   PlayStates playState;
 } typedef GameState;
 
+typedef enum BorderFlags {
+  BORDER_TOP = 1,
+  BORDER_LEFT = 2,
+  BORDER_BOTTOM = 4,
+  BORDER_RIGHT = 8,
+  BORDER_ALL = 15
+} BorderFlags;
