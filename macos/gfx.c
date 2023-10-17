@@ -1,6 +1,8 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 
+#include <assert.h> // might remove these as we import more into main
+
 #include "colours.h"
 
 /*
@@ -15,6 +17,20 @@ static const int WINDOW_HEIGHT = FIELD_HEIGHT + (2 * SIZE_PADDING);
 static const int WINDOW_WIDTH = (2 * FIELD_WIDTH) + (2 * SIZE_PADDING);
 
 static const char* FONT_PATH = "IBMPlexMono-SemiBold.ttf";
+
+static const char* TITLE = "Play NOTRIS!";
+static const int TITLE_S = 24;
+static const int TITLE_X = (1.5 * FIELD_WIDTH) - 32;
+static const int TITLE_Y = SIZE_PADDING + 8;
+
+static const int SCORE_S = 18;
+static const char* SCORE_TEXT = "SCORE";
+static const int SCORE_X = SIZE_PADDING + FIELD_WIDTH + 20;
+static const int SCORE_Y = TITLE_Y + 66;
+static const int SCORE_Y2 = SCORE_Y + 24;
+static const char* LINES_TEXT = "LINES";
+static const int LINES_Y = SCORE_Y2 + 50;
+static const int LINES_Y2 = LINES_Y + 24;
 
 /*
  * Shared references
@@ -170,10 +186,31 @@ static void drawFrame() {
     SIZE_PADDING,
     SIZE_PADDING,
     SIZE_PADDING + FIELD_WIDTH,
-    SIZE_PADDING + FIELD_HEIGHT,
+    SIZE_PADDING + FIELD_HEIGHT + SIZE_BORDER,
     SIZE_BORDER * -1,
     BORDER_ALL
   );
+}
+
+static void drawText(const char* text, int x, int y, int size) {
+  int fontSizeSet = TTF_SetFontSize(p_font, size);
+  assert(fontSizeSet == 0);
+
+  SDL_Surface *p_surface = TTF_RenderUTF8_Blended(p_font, text, colours_offWhite);
+  SDL_Texture *p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
+
+  SDL_Rect rect = { x, y, .w = p_surface->w, .h = p_surface->h };
+  SDL_RenderCopy(p_renderer, p_texture, NULL, &rect);
+
+  SDL_DestroyTexture(p_texture);
+  SDL_FreeSurface(p_surface);
+}
+
+char* intToString(int number) {
+  int tens = ceil(log10(number)) + 1;
+  char* string = malloc(tens * sizeof(char));
+  sprintf(string, "%d", number);
+  return string;
 }
 
 /*
@@ -215,7 +252,22 @@ void gfx_drawDebug() {
   drawBlock(&colours_blue, 1, 1);
 
   drawBlock(&colours_orange, 9, 0);
+  drawBlock(&colours_purple, 5, 23);
+
+  // title
+  drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
+
+  drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S);
+  char* score = intToString(123);
+  drawText(score, SCORE_X, SCORE_Y2, SCORE_S);
+
+  drawText(LINES_TEXT, SCORE_X, LINES_Y, SCORE_S);
+  char* lines = intToString(456);
+  drawText(lines, SCORE_X, LINES_Y2, SCORE_S);
 
   // flip buffer
   SDL_RenderPresent(p_renderer);
+
+  free(score);
+  free(lines);
 }

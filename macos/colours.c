@@ -1,7 +1,6 @@
 #include "colours.h"
 
 SDL_Color colours_black = {0x00, 0x00, 0x00, 0xFF};
-
 SDL_Color colours_offWhite = {0xF4, 0xF4, 0xF4, 0xFF};
 
 ColourPalette colours_blue = {
