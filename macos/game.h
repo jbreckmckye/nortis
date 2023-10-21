@@ -1,7 +1,8 @@
-// #include "defs.h"
+#include "defs.h"
 
-// const Field* game_getFieldState();
-// const GameState* game_getGameState();
+const DrawField *game_drawField;
+
+void game_updateDrawField();
 
 // void game_actionHardDrop();
 // void game_actionMovement(GameMovements);

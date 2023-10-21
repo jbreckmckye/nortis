@@ -24,8 +24,8 @@ typedef enum BlockNames {
 } BlockNames;
 
 typedef enum PlayStates {
-  PLAYING,
-  GAMEOVER
+  PLAY_PLAYING,
+  PLAY_GAMEOVER
 } PlayStates;
 
 typedef enum GameMovements {
@@ -33,22 +33,22 @@ typedef enum GameMovements {
   MOVERIGHT
 } GameMovements;
 
-enum GameCollisions {
-  COLLIDE_NONE,
+typedef enum GameCollisions {
+  COLLIDE_NONE = 0,
   COLLIDE_LEFTWALL,
   COLLIDE_RIGHTWALL,
   COLLIDE_BOTTOMWALL,
   COLLIDE_CELL
-};
+} GameCollisions;
 
 typedef int Field[HEIGHT][WIDTH];
+typedef int DrawField[HEIGHT - HIDDEN_ROWS][WIDTH];
 
 struct GameState {
   BlockNames blockName;
   int blockRotation;
   int clearedLines;
   int dropDelay;
-  Field *p_field;
   int points;
   int positionX;
   int positionY;
