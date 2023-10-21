@@ -6,15 +6,18 @@
 
 #define WIDTH 10
 #define HEIGHT 26
-#define BLOCK_SIZE 24
 #define HIDDEN_ROWS 2
+#define DRAW_HEIGHT (HEIGHT - HIDDEN_ROWS)
+#define BLOCK_SIZE 24
+
 #define SIZE_PADDING 32
 #define SIZE_BORDER 4
 
 #define GRID_BIT_OFFSET 0x8000
 
 typedef enum BlockNames {
-  BLOCK_I = 1,
+  BLOCK_NONE,
+  BLOCK_I,
   BLOCK_J,
   BLOCK_L,
   BLOCK_O,
@@ -41,8 +44,8 @@ typedef enum GameCollisions {
   COLLIDE_CELL
 } GameCollisions;
 
-typedef int Field[HEIGHT][WIDTH];
-typedef int DrawField[HEIGHT - HIDDEN_ROWS][WIDTH];
+typedef BlockNames Field[HEIGHT][WIDTH];
+typedef BlockNames DrawField[HEIGHT - HIDDEN_ROWS][WIDTH];
 
 struct GameState {
   BlockNames blockName;

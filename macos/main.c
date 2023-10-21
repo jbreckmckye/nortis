@@ -1,4 +1,8 @@
+#include <stdlib.h>
+#include <time.h>
+
 #include "./gfx/gfx.h"
+#include "game.h"
 
 int main(int argc, char* argv[]) {
   printf("Start\n");
@@ -12,7 +16,12 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  gfx_drawDebug();
+  // Seed random number generator
+  srand(time(NULL));
+
+  game_actionRestart();
+  game_updateDrawField();
+  gfx_drawDebug(game_p_drawField);
 
   bool quit = false;
   SDL_Event event;

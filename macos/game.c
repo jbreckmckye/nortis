@@ -4,9 +4,10 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-static Field g_field;
-static DrawField g_drawField;
+static Field g_field = { 0 };
+static DrawField g_drawField = { 0 };
 static GameState g_gameState;
 
 /**
@@ -69,10 +70,26 @@ static void mutateField_clear() {
  * Update state for a new block spawn
  */
 static GameCollisions mutateState_spawn() {
-  g_gameState.blockName = BLOCK_I; // randomBlock();
+  g_gameState.blockName = randomBlock();
   g_gameState.blockRotation = 0;
-  g_gameState.positionX = 5;
+  g_gameState.positionX = 4;
   g_gameState.positionY = 0;
+
+  switch (g_gameState.blockName) {
+    case BLOCK_I:
+    case BLOCK_T:
+      g_gameState.positionY = 1;
+      break;
+    case BLOCK_J:
+    case BLOCK_L:
+    case BLOCK_O:
+    case BLOCK_S:
+    case BLOCK_Z:
+      g_gameState.positionY = 2;
+      break;
+    default:
+      assert(g_gameState.blockName != 0);
+  }
 
   shapeHex shape = getBlockShape(g_gameState.blockName, 0);
   return getDropCollision(shape, g_gameState.positionX, g_gameState.positionY);
@@ -114,17 +131,16 @@ void game_actionRestart() {
  * Copies field + piece items into a field grid
  */
 void game_updateDrawField() {
-  for (int y = HIDDEN_ROWS; y < HEIGHT; y++) {
-    int shiftedY = y - HIDDEN_ROWS;
+  for (int y = 0; y < DRAW_HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
-      g_drawField[shiftedY][x] = g_field[y][x];
+      g_drawField[y][x] = g_field[y + HIDDEN_ROWS][x];
     }
   }
 
   shapeHex shape = getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
   BlockNames block = g_gameState.blockName;
 
-  const int DRAW_FIELD_HEIGHT = HEIGHT - HIDDEN_ROWS;
+  printf("Block drawn is %d , pos %d %d \n", block, g_gameState.positionY, g_gameState.positionX);
 
   for (int y = 0; y <= 3; y++) {
     for (int x = 0; x <= 3; x++) {
@@ -133,16 +149,15 @@ void game_updateDrawField() {
       if (bit == 0) continue;
 
       // Get projections, bound to field limits
-      int projectedY = g_gameState.positionY + y - HIDDEN_ROWS;
-      int projectedX = g_gameState.positionX + x;
+      int fieldY = g_gameState.positionY + y;
+      int fieldX = g_gameState.positionX + x;
 
-      if (projectedY < 0) continue;
-      if (projectedY >= DRAW_FIELD_HEIGHT) continue;
-      if (projectedX < 0) continue;
-      if (projectedX >= DRAW_FIELD_HEIGHT) continue;
+      if (fieldY < HIDDEN_ROWS) continue;
+      if (fieldY >= HEIGHT) continue;
+      if (fieldX < 0) continue;
+      if (fieldX >= WIDTH) continue;
 
-      // Copy block into field
-      g_drawField[projectedY][projectedX] = block;
+      g_drawField[fieldY - HIDDEN_ROWS][fieldX] = block;
     }
   }
 }

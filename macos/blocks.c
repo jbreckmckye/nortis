@@ -32,7 +32,8 @@
  * ================================================================================================
  */
 
-static shapeHex shapeHexes[7][4] = {
+static shapeHex shapeHexes[8][4] = {
+  { 0 },                              // EMPTY   
   { 0x0F00, 0x4444, 0x0F00, 0x4444 }, // I
   { 0xE200, 0x44C0, 0x8E00, 0xC880 }, // J
   { 0xE800, 0xC440, 0x2E00, 0x88C0 }, // L
@@ -52,7 +53,7 @@ rotationIndex getNextRotation(int r) {
 }
 
 shapeHex getBlockShape(BlockNames key, rotationIndex r) {
-  assert(key >= 0 && key < 7);
+  assert(key >= 0 && key < 8);
   assert(r >= 0 && r < 4);
 
   return shapeHexes[key][r];
@@ -65,5 +66,5 @@ shapeHex getBlockShape(BlockNames key, rotationIndex r) {
 
 BlockNames randomBlock() {
   // Not truly random (has skew) but probably fine for a game
-  return rand() % 7;
+  return (rand() % 7) + 1;
 }

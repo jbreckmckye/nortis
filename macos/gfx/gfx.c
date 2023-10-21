@@ -1,6 +1,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 
+#include <stdio.h>
 #include <assert.h> // might remove these as we import more into main
 
 #include "colours.h"
@@ -139,7 +140,7 @@ static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int 
   if (borders & BORDER_RIGHT) SDL_RenderFillRect(p_renderer, &vline);
 }
 
-static void drawBlock(ColourPalette *p_palette, int posX, int posY) {
+static void drawSquare(ColourPalette *p_palette, int posX, int posY) {
   const int borderWidth = 2;
 
   SDL_SetRenderDrawColor(
@@ -235,7 +236,7 @@ void gfx_cleanup() {
   SDL_Quit();
 }
 
-void gfx_drawDebug() {
+void gfx_drawDebug(const DrawField *p_drawField) {
   // "You are strongly encouraged to call SDL_RenderClear() to initialise the backbuffer
   //  before starting each new frame's drawing, even if you plan to overwrite every pixel"
   // "...Do not assume that previous contents will exist betwen frames"
@@ -250,14 +251,17 @@ void gfx_drawDebug() {
   // frame
   drawFrame();
 
-  // block
-  drawBlock(&colours_blue, 0, 2);
-  drawBlock(&colours_blue, 1, 2);
-  drawBlock(&colours_blue, 2, 2);
-  drawBlock(&colours_blue, 1, 1);
-
-  drawBlock(&colours_orange, 9, 0);
-  drawBlock(&colours_purple, 5, 23);
+  // field
+  for (int y = 0; y < DRAW_HEIGHT; y++) {
+    for (int x = 0; x < WIDTH; x++) {
+      int square = (*p_drawField)[y][x];
+      if (square) {
+        BlockNames blockKey = square;
+        ColourPalette *p_palette = colours_blockPalette(blockKey);
+        drawSquare(p_palette, x, y);
+      }
+    }
+  }
 
   // title
   drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
