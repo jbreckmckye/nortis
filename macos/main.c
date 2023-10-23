@@ -4,6 +4,8 @@
 #include "./gfx/gfx.h"
 #include "game.h"
 
+const char* TITLE = "NOTRIS ";
+
 int main(int argc, char* argv[]) {
   printf("Start\n");
 
@@ -20,21 +22,26 @@ int main(int argc, char* argv[]) {
   srand(time(NULL));
 
   game_actionRestart();
-  game_updateDrawField();
-  gfx_drawDebug(game_p_drawField);
 
   bool quit = false;
   SDL_Event event;
 
   while (!quit) {
-    while (SDL_PollEvent(&event) != 0) { // Drain queue of events since last loop iteration
+    // Drain queue of events since last loop iteration
+    while (SDL_PollEvent(&event) != 0) {
       if (event.type == SDL_QUIT) {
         quit = true;
+        break;
       }
     }
+
+    //Uint32 start = SDL_GetTicks();
+    game_updateDrawState();
+    gfx_drawDebug(game_p_drawField);
+    //Uint32 ticks = SDL_GetTicks() - start;
+    //printf("Frame took %d ms\n", ticks);
   }
 
-  printf("Quit\n");
   gfx_cleanup();
   return 0;
 }

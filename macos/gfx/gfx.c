@@ -207,6 +207,10 @@ static void drawText(const char* text, int x, int y, int size) {
   SDL_FreeSurface(p_surface);
 }
 
+/**
+ * PSX NOTE
+ * We'll probably want a more fixed-memory, simplified approach for PSX here 
+ */
 char* intToString(int number) {
   int tens = ceil(log10(number)) + 1;
   char* string = malloc(tens * sizeof(char));

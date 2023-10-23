@@ -1,8 +1,14 @@
 #include "defs.h"
 
-const DrawField *game_p_drawField;
+/**
+ * Pointer to read-only draw state 
+ */
+const DrawField* game_p_drawField;
 
-void game_updateDrawField();
+/**
+ * Updates draw-state, call before render
+ */
+void game_updateDrawState();
 
 // void game_actionHardDrop();
 // void game_actionMovement(GameMovements);

@@ -130,7 +130,7 @@ void game_actionRestart() {
 /**
  * Copies field + piece items into a field grid
  */
-void game_updateDrawField() {
+void game_updateDrawState() {
   for (int y = 0; y < DRAW_HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
       g_drawField[y][x] = g_field[y + HIDDEN_ROWS][x];
@@ -139,8 +139,6 @@ void game_updateDrawField() {
 
   shapeHex shape = getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
   BlockNames block = g_gameState.blockName;
-
-  printf("Block drawn is %d , pos %d %d \n", block, g_gameState.positionY, g_gameState.positionX);
 
   for (int y = 0; y <= 3; y++) {
     for (int x = 0; x <= 3; x++) {
