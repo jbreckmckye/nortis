@@ -3,6 +3,7 @@
 #include "defs.h"
 
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -104,7 +105,30 @@ static void mutateState_resetGame() {
   g_gameState.points = 0;
   g_gameState.playState = PLAY_PLAYING;
   mutateState_spawn();
-  
+}
+
+static void mutateState_setY(int nextY) {
+  g_gameState.positionY = nextY;
+}
+
+static GameCollisions downOne() {
+  int nextX = g_gameState.positionX;
+  int nextY = g_gameState.positionY + 1;
+  shapeHex shape = getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
+
+  GameCollisions collision = getDropCollision(shape, nextX, nextY);
+  if (collision == COLLIDE_NONE) {
+    mutateState_setY(nextY);
+  }
+
+  return collision;
+}
+
+static void downMany() {
+  GameCollisions collision = COLLIDE_NONE;
+  while (collision == COLLIDE_NONE) {
+    collision = downOne();
+  }
 }
 
 /**
@@ -125,6 +149,12 @@ const DrawField* game_p_drawField = &g_drawField;
 void game_actionRestart() {
   mutateField_clear();
   mutateState_resetGame();
+}
+
+uint64_t game_getSpeed() {
+  int setsCleared = g_gameState.clearedLines / 4;
+  int level = fmax(fmin(1, setsCleared), 10);
+  return 500 - (level * 15);
 }
 
 /**
@@ -164,4 +194,10 @@ void game_updateDrawState() {
 // void game_actionMovement(GameMovements);
 // void game_actionRestart();
 // void game_actionRotate();
-// void game_actionSoftDrop();
+
+void game_actionSoftDrop() {
+  GameCollisions collision = downOne();
+  if (collision != COLLIDE_NONE) {
+    printf("Commit piece!\n");
+  }
+}

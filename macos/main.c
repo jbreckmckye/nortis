@@ -4,8 +4,6 @@
 #include "./gfx/gfx.h"
 #include "game.h"
 
-const char* TITLE = "NOTRIS ";
-
 int main(int argc, char* argv[]) {
   printf("Start\n");
 
@@ -26,7 +24,11 @@ int main(int argc, char* argv[]) {
   bool quit = false;
   SDL_Event event;
 
+  Uint64 gravityTicker = SDL_GetTicks64();
+
   while (!quit) {
+    Uint64 start = SDL_GetTicks64();
+
     // Drain queue of events since last loop iteration
     while (SDL_PollEvent(&event) != 0) {
       if (event.type == SDL_QUIT) {
@@ -35,11 +37,21 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    //Uint32 start = SDL_GetTicks();
+    if ((start - gravityTicker) > game_getSpeed()) {
+      game_actionSoftDrop();
+      gravityTicker = start;
+    }
+
     game_updateDrawState();
     gfx_drawDebug(game_p_drawField);
-    //Uint32 ticks = SDL_GetTicks() - start;
-    //printf("Frame took %d ms\n", ticks);
+    
+    // Uint64 duration = SDL_GetTicks64() - start;
+    // printf("Frame took %d ms\n", duration);
+
+    // Limit to 60 fps
+    while ((SDL_GetTicks64() - start) < 18) {
+      SDL_Delay(1);
+    }
   }
 
   gfx_cleanup();
