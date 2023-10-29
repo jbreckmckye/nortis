@@ -121,6 +121,10 @@ static void mutateState_resetGame() {
   mutateState_spawn();
 }
 
+static void mutateState_gameOver() {
+  g_gameState.playState = PLAY_GAMEOVER;
+}
+
 static void mutateState_setY(int nextY) {
   g_gameState.positionY = nextY;
 }
@@ -197,8 +201,11 @@ static void action_commitPiece() {
     g_gameState.clearedLines += cleared;
   }
 
-  // Respawn
-  mutateState_spawn();
+  // Respawn, check game over
+  GameCollisions spawnCollision = mutateState_spawn();
+  if (spawnCollision) {
+    mutateState_gameOver();
+  }
 }
 
 /**
@@ -219,6 +226,10 @@ const DrawField* game_p_drawField = &g_drawField;
 void game_actionRestart() {
   mutateField_clear();
   mutateState_resetGame();
+}
+
+PlayStates game_getPlayState() {
+  return g_gameState.playState;
 }
 
 uint64_t game_getSpeed() {

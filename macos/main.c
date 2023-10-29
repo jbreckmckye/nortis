@@ -24,11 +24,9 @@ int main(int argc, char* argv[]) {
   bool quit = false;
   SDL_Event event;
 
-  Uint64 gravityTicker = SDL_GetTicks64();
+  Uint64 timeLastDrop = SDL_GetTicks64();
 
   while (!quit) {
-    Uint64 start = SDL_GetTicks64();
-
     // Drain queue of events since last loop iteration
     while (SDL_PollEvent(&event) != 0) {
       if (event.type == SDL_QUIT) {
@@ -37,9 +35,16 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    if ((start - gravityTicker) > game_getSpeed()) {
-      game_actionSoftDrop();
-      gravityTicker = start;
+    Uint64 timeFrameStart = SDL_GetTicks64();
+
+    if (game_getPlayState() == PLAY_PLAYING) {
+      if ((timeFrameStart - timeLastDrop) > game_getSpeed()) {
+        game_actionSoftDrop();
+        timeLastDrop = timeFrameStart;
+      }
+    } else {
+      printf("Game over, quitting :p\n");
+      quit = true;
     }
 
     game_updateDrawState();
@@ -49,7 +54,7 @@ int main(int argc, char* argv[]) {
     // printf("Frame took %d ms\n", duration);
 
     // Limit to 60 fps
-    while ((SDL_GetTicks64() - start) < 18) {
+    while ((SDL_GetTicks64() - timeFrameStart) < 18) {
       SDL_Delay(1);
     }
   }
