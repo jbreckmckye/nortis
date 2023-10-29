@@ -41,8 +41,8 @@ typedef enum {
 } GameInputs;
 
 typedef enum GameMovements {
-  MOVE_LEFT,
-  MOVE_RIGHT
+  MOVE_LEFT = -1,
+  MOVE_RIGHT = 1,
 } GameMovements;
 
 typedef enum GameCollisions {

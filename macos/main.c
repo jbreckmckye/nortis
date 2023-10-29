@@ -72,6 +72,11 @@ int main(int argc, char* argv[]) {
 
     if (game_getPlayState() == PLAY_PLAYING) {
       // Handle rotations and left/right before dropping
+      if (input == INPUT_LEFT) {
+        game_actionMovement(MOVE_LEFT);
+      } else if (input == INPUT_RIGHT) {
+        game_actionMovement(MOVE_RIGHT);
+      }
 
       // Handle timed or forced drops
       // These should reset the gravity timer

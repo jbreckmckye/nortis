@@ -17,7 +17,7 @@ void game_updateDrawState();
 
 void game_actionHardDrop();
 
-// void game_actionMovement(GameMovements);
+void game_actionMovement(GameMovements movement);
 
 void game_actionRestart();
 

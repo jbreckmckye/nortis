@@ -11,6 +11,10 @@ static Field g_field = { 0 };
 static DrawField g_drawField = { 0 };
 static GameState g_gameState;
 
+static shapeHex getCurrentShape() {
+  return getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
+}
+
 /**
  * Get collisions for proposed (drop/spawn) shape, x, y values
  */
@@ -109,7 +113,7 @@ static GameCollisions mutateState_spawn() {
       assert(g_gameState.blockName != 0);
   }
 
-  shapeHex shape = getBlockShape(g_gameState.blockName, 0);
+  shapeHex shape = getCurrentShape();
   return getDropCollision(shape, g_gameState.positionX, g_gameState.positionY);
 }
 
@@ -128,6 +132,10 @@ static void mutateState_gameOver() {
   g_gameState.playState = PLAY_GAMEOVER;
 }
 
+static void mutateState_setX(int nextX) {
+  g_gameState.positionX = nextX;
+}
+
 static void mutateState_setY(int nextY) {
   g_gameState.positionY = nextY;
 }
@@ -135,7 +143,7 @@ static void mutateState_setY(int nextY) {
 static GameCollisions downOne() {
   int nextX = g_gameState.positionX;
   int nextY = g_gameState.positionY + 1;
-  shapeHex shape = getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
+  shapeHex shape = getCurrentShape();
 
   GameCollisions collision = getDropCollision(shape, nextX, nextY);
   if (collision == COLLIDE_NONE) {
@@ -191,7 +199,7 @@ static void action_commitPiece() {
   // Insert landed piece
   mutateField_insertBlock(
     g_gameState.blockName,
-    getBlockShape(g_gameState.blockName, g_gameState.blockRotation),
+    getCurrentShape(),
     g_gameState.positionX,
     g_gameState.positionY
   );
@@ -251,7 +259,7 @@ void game_updateDrawState() {
     }
   }
 
-  shapeHex shape = getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
+  shapeHex shape = getCurrentShape();
   BlockNames block = g_gameState.blockName;
 
   for (int y = 0; y <= 3; y++) {
@@ -289,4 +297,22 @@ void game_actionSoftDrop() {
   if (collision != COLLIDE_NONE) {
     action_commitPiece();
   }
+}
+
+void game_actionMovement(GameMovements movement) {
+  int nextX = g_gameState.positionX + movement;
+
+  // Check out of bounds
+  if (nextX < 0 || nextX >= WIDTH) return;
+
+  // Check collisions
+  GameCollisions moveCollision = getCollisions(
+    getCurrentShape(),
+    nextX,
+    g_gameState.positionY
+  );
+  if (moveCollision != COLLIDE_NONE) return;
+
+  // Otherwise, commit change
+  mutateState_setX(nextX);
 }
