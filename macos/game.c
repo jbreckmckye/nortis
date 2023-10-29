@@ -168,9 +168,9 @@ static bool isLineComplete(int y) {
   return true;
 }
 
-static void mutateField_clearLine(int y) {
+static void mutateField_clearLine(int row) {
   // Copy from lines above, except top line
-  for (int y = HEIGHT - 1; y > 0; y--) {
+  for (int y = row; y > 0; y--) {
     BlockNames* line = g_field[y];
     BlockNames* lineAbove = g_field[y - 1];
     for (int x = 0; x < WIDTH; x++) {
