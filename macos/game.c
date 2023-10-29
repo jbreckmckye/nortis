@@ -279,6 +279,11 @@ void game_updateDrawState() {
 // void game_actionRestart();
 // void game_actionRotate();
 
+void game_actionHardDrop() {
+  downMany();
+  action_commitPiece();
+}
+
 void game_actionSoftDrop() {
   GameCollisions collision = downOne();
   if (collision != COLLIDE_NONE) {

@@ -31,9 +31,18 @@ typedef enum PlayStates {
   PLAY_GAMEOVER
 } PlayStates;
 
+typedef enum {
+  INPUT_NONE = 0,
+  INPUT_LEFT,
+  INPUT_RIGHT,
+  INPUT_UP,
+  INPUT_DOWN,
+  INPUT_QUIT
+} GameInputs;
+
 typedef enum GameMovements {
-  MOVELEFT,
-  MOVERIGHT
+  MOVE_LEFT,
+  MOVE_RIGHT
 } GameMovements;
 
 typedef enum GameCollisions {

@@ -4,6 +4,35 @@
 #include "./gfx/gfx.h"
 #include "game.h"
 
+void initRand() {
+  // Seed random number generator
+  // Discard the first rand, as it always is a multiple of 7
+  // https://stackoverflow.com/questions/7866754/why-does-rand-7-always-return-0)
+  srand(time(NULL));
+  rand();
+}
+
+GameInputs parseKey(int keycode) {
+  switch (keycode) {
+    case SDLK_ESCAPE:
+      return INPUT_QUIT;
+    case SDLK_UP:
+    case SDLK_w:
+      return INPUT_UP;
+    case SDLK_DOWN:
+    case SDLK_s:
+      return INPUT_DOWN;
+    case SDLK_LEFT:
+    case SDLK_a:
+      return INPUT_LEFT;
+    case SDLK_RIGHT:
+    case SDLK_d:
+      return INPUT_RIGHT;
+    default:
+      return 0;
+  }
+}
+
 int main(int argc, char* argv[]) {
   printf("Start\n");
 
@@ -16,23 +45,24 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  // Seed random number generator
-  srand(time(NULL));
-  // Discard the first rand, as it always is a multiple of 7
-  // https://stackoverflow.com/questions/7866754/why-does-rand-7-always-return-0)
-  rand();
+  initRand();
 
   game_actionRestart();
 
   bool quit = false;
   SDL_Event event;
-
   Uint64 timeLastDrop = SDL_GetTicks64();
 
   while (!quit) {
+    GameInputs input = INPUT_NONE;
+
     // Drain queue of events since last loop iteration
     while (SDL_PollEvent(&event) != 0) {
-      if (event.type == SDL_QUIT) {
+      if (event.type == SDL_KEYDOWN) {
+        input = parseKey(event.key.keysym.sym);
+      }
+
+      if (input == INPUT_QUIT || event.type == SDL_QUIT) {
         quit = true;
         break;
       }
@@ -41,10 +71,18 @@ int main(int argc, char* argv[]) {
     Uint64 timeFrameStart = SDL_GetTicks64();
 
     if (game_getPlayState() == PLAY_PLAYING) {
-      if ((timeFrameStart - timeLastDrop) > game_getSpeed()) {
+      // Handle rotations and left/right before dropping
+
+      // Handle timed or forced drops
+      // These should reset the gravity timer
+      if (input == INPUT_DOWN) {
+        game_actionHardDrop();
+        timeLastDrop = timeFrameStart;
+      } else if ((timeFrameStart - timeLastDrop) > game_getSpeed()) {
         game_actionSoftDrop();
         timeLastDrop = timeFrameStart;
       }
+
     } else {
       printf("Game over, quitting :p\n");
       quit = true;

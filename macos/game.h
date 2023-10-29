@@ -15,9 +15,12 @@ uint64_t game_getSpeed();
  */
 void game_updateDrawState();
 
-// void game_actionHardDrop();
+void game_actionHardDrop();
+
 // void game_actionMovement(GameMovements);
+
 void game_actionRestart();
+
 // void game_actionRotate();
 
 /**
