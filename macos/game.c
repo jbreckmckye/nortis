@@ -21,9 +21,12 @@ static GameCollisions getDropCollision(shapeHex shape, int x, int y) {
       if (bit) {
         int projectedY = y + row;
         int projectedX = x + col;
-        if (projectedY >= HEIGHT || g_field[projectedY][projectedX]) {
-          return COLLIDE_BOTTOMWALL;
-        }
+
+        // Check out of bounds
+        if (projectedY >= HEIGHT) return COLLIDE_BOTTOMWALL;
+          
+        // Check overlap
+        if (g_field[projectedY][projectedX]) return COLLIDE_CELL;
       }
     }
   }
@@ -47,9 +50,7 @@ static GameCollisions getCollisions(shapeHex shape, int x, int y) {
         if (projectedY >= HEIGHT) return COLLIDE_BOTTOMWALL;
 
         // Check overlap
-        if (g_field[projectedY][projectedX]) {
-          return COLLIDE_CELL;
-        }
+        if (g_field[projectedY][projectedX]) return COLLIDE_CELL;
       }
     }
   }
@@ -67,13 +68,26 @@ static void mutateField_clear() {
   }
 }
 
+static void mutateField_insertBlock(BlockNames blockType, shapeHex shape, int x, int y) {
+  for (int col = 0; col < 4; col++) {
+    for (int row = 0; row < 4; row++) {
+      int bit = getShapeBit(shape, col, row);
+      if (bit) {
+        int projectedX = x + row;
+        int projectedY = y + col;
+        g_field[projectedY][projectedX] = blockType;
+      }
+    }
+  }
+}
+
 /**
  * Update state for a new block spawn
  */
 static GameCollisions mutateState_spawn() {
   g_gameState.blockName = randomBlock();
   g_gameState.blockRotation = 0;
-  g_gameState.positionX = 4;
+  g_gameState.positionX = 3;
   g_gameState.positionY = 0;
 
   switch (g_gameState.blockName) {
@@ -131,8 +145,64 @@ static void downMany() {
   }
 }
 
+static bool isLineComplete(int y) {
+  BlockNames* line = g_field[y];
+  for (int x = 0; x < WIDTH; x++) {
+    if (!line[x]) return false;
+  }
+  return true;
+}
+
+static void mutateField_clearLine(int y) {
+  // Copy from lines above, except top line
+  for (int y = HEIGHT - 1; y > 0; y--) {
+    BlockNames* line = g_field[y];
+    BlockNames* lineAbove = g_field[y - 1];
+    for (int x = 0; x < WIDTH; x++) {
+      line[x] = lineAbove[x];
+    }
+  }
+  // Refresh top line
+  for (int x = 0; x < WIDTH; x++) {
+    g_field[0][x] = BLOCK_NONE;
+  }
+}
+
+static int mutateField_clearLines() {
+  int cleared = 0;
+  for (int y = 0; y < HEIGHT; y++) {
+    bool shouldClear = isLineComplete(y);
+    if (shouldClear) {
+      cleared++;
+      mutateField_clearLine(y);
+    }
+  }
+  return cleared;
+}
+
+static void action_commitPiece() {
+  // Insert landed piece
+  mutateField_insertBlock(
+    g_gameState.blockName,
+    getBlockShape(g_gameState.blockName, g_gameState.blockRotation),
+    g_gameState.positionX,
+    g_gameState.positionY
+  );
+
+  // Clear lines
+  int cleared = mutateField_clearLines();
+
+  // Update score
+  if (cleared) {
+    g_gameState.clearedLines += cleared;
+  }
+
+  // Respawn
+  mutateState_spawn();
+}
+
 /**
- * Public values
+ * Public values (docs in header)
  * ============================================================================
  */
 
@@ -198,6 +268,6 @@ void game_updateDrawState() {
 void game_actionSoftDrop() {
   GameCollisions collision = downOne();
   if (collision != COLLIDE_NONE) {
-    printf("Commit piece!\n");
+    action_commitPiece();
   }
 }
