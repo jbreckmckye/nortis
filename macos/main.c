@@ -76,6 +76,8 @@ int main(int argc, char* argv[]) {
         game_actionMovement(MOVE_LEFT);
       } else if (input == INPUT_RIGHT) {
         game_actionMovement(MOVE_RIGHT);
+      } else if (input == INPUT_UP) {
+        game_actionRotate();
       }
 
       // Handle timed or forced drops

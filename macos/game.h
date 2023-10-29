@@ -21,7 +21,7 @@ void game_actionMovement(GameMovements movement);
 
 void game_actionRestart();
 
-// void game_actionRotate();
+void game_actionRotate();
 
 /**
  * Gravity-based drop by one row 

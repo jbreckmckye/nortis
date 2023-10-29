@@ -132,6 +132,10 @@ static void mutateState_gameOver() {
   g_gameState.playState = PLAY_GAMEOVER;
 }
 
+static void mutateState_setRotation(int rotation) {
+  g_gameState.blockRotation = rotation;
+}
+
 static void mutateState_setX(int nextX) {
   g_gameState.positionX = nextX;
 }
@@ -303,7 +307,8 @@ void game_actionMovement(GameMovements movement) {
   int nextX = g_gameState.positionX + movement;
 
   // Check out of bounds
-  if (nextX < 0 || nextX >= WIDTH) return;
+  // (don't constrain on left, as the left edge of a block's 4x4 grid could be empty)
+  if (nextX >= WIDTH) return;
 
   // Check collisions
   GameCollisions moveCollision = getCollisions(
@@ -315,4 +320,19 @@ void game_actionMovement(GameMovements movement) {
 
   // Otherwise, commit change
   mutateState_setX(nextX);
+}
+
+void game_actionRotate() {
+  int nextRotation = getNextRotation(g_gameState.blockRotation);
+
+  // Check collisions
+  GameCollisions rotationCollision = getCollisions(
+    getBlockShape(g_gameState.blockName, nextRotation),
+    g_gameState.positionX,
+    g_gameState.positionY
+  );
+  if (rotationCollision != COLLIDE_NONE) return;
+
+  // Otherwise, commit change
+  mutateState_setRotation(nextRotation);
 }
