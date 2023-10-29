@@ -87,11 +87,14 @@ static void mutateField_insertBlock(BlockNames blockType, shapeHex shape, int x,
 static GameCollisions mutateState_spawn() {
   g_gameState.blockName = randomBlock();
   g_gameState.blockRotation = 0;
-  g_gameState.positionX = 3;
+  g_gameState.positionX = 4;
   g_gameState.positionY = 0;
 
   switch (g_gameState.blockName) {
     case BLOCK_I:
+      g_gameState.positionX = 3;
+      g_gameState.positionY = 1;
+      break;
     case BLOCK_T:
       g_gameState.positionY = 1;
       break;

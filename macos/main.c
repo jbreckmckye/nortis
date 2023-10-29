@@ -18,6 +18,9 @@ int main(int argc, char* argv[]) {
 
   // Seed random number generator
   srand(time(NULL));
+  // Discard the first rand, as it always is a multiple of 7
+  // https://stackoverflow.com/questions/7866754/why-does-rand-7-always-return-0)
+  rand();
 
   game_actionRestart();
 
