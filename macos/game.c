@@ -9,7 +9,7 @@
 
 static Field g_field = { 0 };
 static DrawField g_drawField = { 0 };
-static GameState g_gameState;
+static GameState g_gameState = { 0 };
 
 static shapeHex getCurrentShape() {
   return getBlockShape(g_gameState.blockName, g_gameState.blockRotation);
@@ -122,7 +122,6 @@ static GameCollisions mutateState_spawn() {
  */
 static void mutateState_resetGame() {
   g_gameState.clearedLines = 0;
-  g_gameState.dropDelay = 500;
   g_gameState.points = 0;
   g_gameState.playState = PLAY_PLAYING;
   mutateState_spawn();

@@ -60,7 +60,6 @@ struct GameState {
   BlockNames blockName;
   int blockRotation;
   int clearedLines;
-  int dropDelay;
   int points;
   int positionX;
   int positionY;
