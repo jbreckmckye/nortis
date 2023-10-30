@@ -6,7 +6,7 @@
  */
 const DrawField* game_p_drawField;
 
-PlayStates game_getPlayState();
+const GameState* game_p_gameState;
 
 uint64_t game_getSpeed();
 

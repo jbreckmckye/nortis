@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 
     Uint64 timeFrameStart = SDL_GetTicks64();
 
-    if (game_getPlayState() == PLAY_PLAYING) {
+    if (game_p_gameState->playState == PLAY_PLAYING) {
       // Handle rotations and left/right before dropping
       if (input == INPUT_LEFT) {
         game_actionMovement(MOVE_LEFT);
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
     }
 
     game_updateDrawState();
-    gfx_drawDebug(game_p_drawField);
+    gfx_draw(game_p_drawField, game_p_gameState);
     
     // Uint64 duration = SDL_GetTicks64() - start;
     // printf("Frame took %d ms\n", duration);

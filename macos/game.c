@@ -233,6 +233,8 @@ static void action_commitPiece() {
  */
 const DrawField* game_p_drawField = &g_drawField;
 
+const GameState* game_p_gameState = &g_gameState;
+
 /**
  * Public functions
  * ============================================================================
@@ -241,10 +243,6 @@ const DrawField* game_p_drawField = &g_drawField;
 void game_actionRestart() {
   mutateField_clear();
   mutateState_resetGame();
-}
-
-PlayStates game_getPlayState() {
-  return g_gameState.playState;
 }
 
 uint64_t game_getSpeed() {
@@ -285,11 +283,6 @@ void game_updateDrawState() {
     }
   }
 }
-
-// void game_actionHardDrop();
-// void game_actionMovement(GameMovements);
-// void game_actionRestart();
-// void game_actionRotate();
 
 void game_actionHardDrop() {
   downMany();

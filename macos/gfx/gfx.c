@@ -25,13 +25,10 @@ static const int TITLE_X = (1.5 * FIELD_WIDTH) - 32;
 static const int TITLE_Y = SIZE_PADDING + 8;
 
 static const int SCORE_S = 18;
-static const char* SCORE_TEXT = "SCORE";
+static const char* SCORE_TEXT = "CLEARED";
 static const int SCORE_X = SIZE_PADDING + FIELD_WIDTH + 20;
 static const int SCORE_Y = TITLE_Y + 66;
 static const int SCORE_Y2 = SCORE_Y + 24;
-static const char* LINES_TEXT = "LINES";
-static const int LINES_Y = SCORE_Y2 + 50;
-static const int LINES_Y2 = LINES_Y + 24;
 
 /*
  * Shared references
@@ -140,7 +137,7 @@ static void drawBorder(SDL_Color *p_colour, int x1, int y1, int x2, int y2, int 
   if (borders & BORDER_RIGHT) SDL_RenderFillRect(p_renderer, &vline);
 }
 
-static void drawSquare(ColourPalette *p_palette, int posX, int posY) {
+static void drawPlayPiece(ColourPalette *p_palette, int posX, int posY) {
   const int borderWidth = 2;
 
   SDL_SetRenderDrawColor(
@@ -181,7 +178,7 @@ static void drawSquare(ColourPalette *p_palette, int posX, int posY) {
   );
 }
 
-static void drawFrame() {
+static void drawPlayBox() {
   drawBorder(
     &colours_offWhite,
     SIZE_PADDING,
@@ -209,13 +206,18 @@ static void drawText(const char* text, int x, int y, int size) {
 
 /**
  * PSX NOTE
- * We'll probably want a more fixed-memory, simplified approach for PSX here 
+ * We'll probably want a more fixed-memory, simplified approach for PSX here,
+ * due to its buggy malloc()
  */
-char* intToString(int number) {
-  int tens = ceil(log10(number)) + 1;
-  char* string = malloc(tens * sizeof(char));
-  sprintf(string, "%d", number);
-  return string;
+char* newIntString(int number) {
+  double tens = number == 0 ? 1 : ceil(log10(number)) + 1;
+  char* p_string = malloc(tens * sizeof(char));
+  sprintf(p_string, "%d", number);
+  return p_string;
+}
+
+void freeIntString(char* p_string) {
+  free(p_string);
 }
 
 /*
@@ -240,47 +242,82 @@ void gfx_cleanup() {
   SDL_Quit();
 }
 
-void gfx_drawDebug(const DrawField *p_drawField) {
-  // "You are strongly encouraged to call SDL_RenderClear() to initialise the backbuffer
-  //  before starting each new frame's drawing, even if you plan to overwrite every pixel"
-  // "...Do not assume that previous contents will exist betwen frames"
+void gfx_draw(const DrawField* p_drawField, const GameState* p_gameState) {
+  // Clear the backbuffer
   SDL_RenderClear(p_renderer);
 
+  // Black background
   SDL_Color bkg = colours_black;
-
-  // bkg
   SDL_SetRenderDrawColor(p_renderer, bkg.r, bkg.g, bkg.b, bkg.a);
   SDL_RenderFillRect(p_renderer, NULL);
 
-  // frame
-  drawFrame();
+  // Play box and play pieces
 
-  // field
+  drawPlayBox();
+
   for (int y = 0; y < DRAW_HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
-      int square = (*p_drawField)[y][x];
-      if (square) {
-        BlockNames blockKey = square;
+      int blockKey = (*p_drawField)[y][x];
+      if (blockKey) {
         ColourPalette *p_palette = colours_blockPalette(blockKey);
-        drawSquare(p_palette, x, y);
+        drawPlayPiece(p_palette, x, y);
       }
     }
   }
 
-  // title
+  // UI
   drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
-
   drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S);
-  char* score = intToString(123);
-  drawText(score, SCORE_X, SCORE_Y2, SCORE_S);
+  char* p_score = newIntString(p_gameState->clearedLines);
+  drawText(p_score, SCORE_X, SCORE_Y2, SCORE_S);
+  freeIntString(p_score);
+  p_score = NULL;
 
-  drawText(LINES_TEXT, SCORE_X, LINES_Y, SCORE_S);
-  char* lines = intToString(456);
-  drawText(lines, SCORE_X, LINES_Y2, SCORE_S);
-
-  // flip buffer
+  // Flip back buffer
   SDL_RenderPresent(p_renderer);
-
-  free(score);
-  free(lines);
 }
+
+// void gfx_drawDebug(const DrawField *p_drawField) {
+//   // "You are strongly encouraged to call SDL_RenderClear() to initialise the backbuffer
+//   //  before starting each new frame's drawing, even if you plan to overwrite every pixel"
+//   // "...Do not assume that previous contents will exist betwen frames"
+//   SDL_RenderClear(p_renderer);
+
+//   SDL_Color bkg = colours_black;
+
+//   // bkg
+//   SDL_SetRenderDrawColor(p_renderer, bkg.r, bkg.g, bkg.b, bkg.a);
+//   SDL_RenderFillRect(p_renderer, NULL);
+
+//   // frame
+//   drawPlayBox();
+
+//   // field
+//   for (int y = 0; y < DRAW_HEIGHT; y++) {
+//     for (int x = 0; x < WIDTH; x++) {
+//       int square = (*p_drawField)[y][x];
+//       if (square) {
+//         BlockNames blockKey = square;
+//         ColourPalette *p_palette = colours_blockPalette(blockKey);
+//         drawPlayPiece(p_palette, x, y);
+//       }
+//     }
+//   }
+
+//   // title
+//   drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
+
+//   drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S);
+//   char* p_score = newIntString(123);
+//   drawText(p_score, SCORE_X, SCORE_Y2, SCORE_S);
+
+//   // drawText(LINES_TEXT, SCORE_X, LINES_Y, SCORE_S);
+//   // char* lines = intToString(456);
+//   // drawText(lines, SCORE_X, LINES_Y2, SCORE_S);
+
+//   // flip buffer
+//   SDL_RenderPresent(p_renderer);
+
+//   freeIntString(p_score);
+//   // free(lines);
+// }

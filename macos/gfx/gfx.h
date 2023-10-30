@@ -4,4 +4,4 @@
 bool gfx_init();
 void gfx_cleanup();
 
-void gfx_drawDebug(const DrawField *drawField);
+void gfx_draw(const DrawField* drawField, const GameState* p_gameState);
