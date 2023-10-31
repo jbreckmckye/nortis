@@ -20,6 +20,7 @@ static const int WINDOW_WIDTH = (2 * FIELD_WIDTH) + (2 * SIZE_PADDING);
 static const char* FONT_PATH = "IBMPlexMono-SemiBold.ttf";
 
 static const char* TITLE = "Play NOTRIS!";
+static const char* TITLE_GAMEOVER = "Game over!";
 static const int TITLE_S = 24;
 static const int TITLE_X = (1.5 * FIELD_WIDTH) - 32;
 static const int TITLE_Y = SIZE_PADDING + 8;
@@ -29,6 +30,10 @@ static const char* SCORE_TEXT = "CLEARED";
 static const int SCORE_X = SIZE_PADDING + FIELD_WIDTH + 20;
 static const int SCORE_Y = TITLE_Y + 66;
 static const int SCORE_Y2 = SCORE_Y + 24;
+
+static const char* CONTROLS = "Use WASD to play";
+static const char* CONTROLS_GAMEOVER = "Press R to restart";
+static const int CONTROLS_Y = SCORE_Y2 + 66;
 
 /*
  * Shared references
@@ -190,11 +195,11 @@ static void drawPlayBox() {
   );
 }
 
-static void drawText(const char* text, int x, int y, int size) {
+static void drawText(const char* text, int x, int y, int size, SDL_Color colour) {
   int fontSizeSet = TTF_SetFontSize(p_font, size);
   assert(fontSizeSet == 0);
 
-  SDL_Surface *p_surface = TTF_RenderUTF8_Blended(p_font, text, colours_offWhite);
+  SDL_Surface *p_surface = TTF_RenderUTF8_Blended(p_font, text, colour);
   SDL_Texture *p_texture = SDL_CreateTextureFromSurface(p_renderer, p_surface);
 
   SDL_Rect rect = { x, y, .w = p_surface->w, .h = p_surface->h };
@@ -266,59 +271,35 @@ void gfx_draw(const DrawField* p_drawField, const GameState* p_gameState) {
     }
   }
 
-  // UI
-  drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
-  drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S);
-  char* p_score = newIntString(p_gameState->clearedLines);
-  drawText(p_score, SCORE_X, SCORE_Y2, SCORE_S);
-  freeIntString(p_score);
-  p_score = NULL;
+  /**
+   * UI layout:
+   * ----------
+   * 
+   * # TITLE / GAME OVER
+   * 
+   * ## Cleared:
+   * ## 123
+   * 
+   * ## Controls / Restart game
+   */
+  char* p_clearedLines = newIntString(p_gameState->clearedLines);
+
+  if (p_gameState->playState == PLAY_PLAYING) {
+    drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S, colours_offWhite);
+    drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S, colours_offWhite);
+    drawText(p_clearedLines, SCORE_X, SCORE_Y2, SCORE_S, colours_offWhite);
+    drawText(CONTROLS, SCORE_X, CONTROLS_Y, SCORE_S, colours_offWhite);
+
+  } else {
+    drawText(TITLE_GAMEOVER, TITLE_X, TITLE_Y, TITLE_S, colours_red.dark);
+    drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S, colours_red.dark);
+    drawText(p_clearedLines, SCORE_X, SCORE_Y2, SCORE_S, colours_red.dark);
+    drawText(CONTROLS_GAMEOVER, SCORE_X, CONTROLS_Y, SCORE_S, colours_offWhite);
+  }
+
+  freeIntString(p_clearedLines);
+  p_clearedLines = NULL;
 
   // Flip back buffer
   SDL_RenderPresent(p_renderer);
 }
-
-// void gfx_drawDebug(const DrawField *p_drawField) {
-//   // "You are strongly encouraged to call SDL_RenderClear() to initialise the backbuffer
-//   //  before starting each new frame's drawing, even if you plan to overwrite every pixel"
-//   // "...Do not assume that previous contents will exist betwen frames"
-//   SDL_RenderClear(p_renderer);
-
-//   SDL_Color bkg = colours_black;
-
-//   // bkg
-//   SDL_SetRenderDrawColor(p_renderer, bkg.r, bkg.g, bkg.b, bkg.a);
-//   SDL_RenderFillRect(p_renderer, NULL);
-
-//   // frame
-//   drawPlayBox();
-
-//   // field
-//   for (int y = 0; y < DRAW_HEIGHT; y++) {
-//     for (int x = 0; x < WIDTH; x++) {
-//       int square = (*p_drawField)[y][x];
-//       if (square) {
-//         BlockNames blockKey = square;
-//         ColourPalette *p_palette = colours_blockPalette(blockKey);
-//         drawPlayPiece(p_palette, x, y);
-//       }
-//     }
-//   }
-
-//   // title
-//   drawText(TITLE, TITLE_X, TITLE_Y, TITLE_S);
-
-//   drawText(SCORE_TEXT, SCORE_X, SCORE_Y, SCORE_S);
-//   char* p_score = newIntString(123);
-//   drawText(p_score, SCORE_X, SCORE_Y2, SCORE_S);
-
-//   // drawText(LINES_TEXT, SCORE_X, LINES_Y, SCORE_S);
-//   // char* lines = intToString(456);
-//   // drawText(lines, SCORE_X, LINES_Y2, SCORE_S);
-
-//   // flip buffer
-//   SDL_RenderPresent(p_renderer);
-
-//   freeIntString(p_score);
-//   // free(lines);
-// }

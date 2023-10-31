@@ -28,6 +28,8 @@ GameInputs parseKey(int keycode) {
     case SDLK_RIGHT:
     case SDLK_d:
       return INPUT_RIGHT;
+    case SDLK_r:
+      return INPUT_RESTART;
     default:
       return 0;
   }
@@ -91,8 +93,10 @@ int main(int argc, char* argv[]) {
       }
 
     } else {
-      printf("Game over, quitting :p\n");
-      quit = true;
+      if (input == INPUT_RESTART) {
+        game_actionRestart();
+        timeLastDrop = timeFrameStart;
+      }
     }
 
     game_updateDrawState();

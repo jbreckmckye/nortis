@@ -37,7 +37,8 @@ typedef enum {
   INPUT_RIGHT,
   INPUT_UP,
   INPUT_DOWN,
-  INPUT_QUIT
+  INPUT_QUIT,
+  INPUT_RESTART,
 } GameInputs;
 
 typedef enum GameMovements {
