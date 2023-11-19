@@ -216,7 +216,7 @@ static void drawText(const char* text, int x, int y, int size, SDL_Color colour)
  */
 char* newIntString(int number) {
   double tens = number == 0 ? 1 : ceil(log10(number)) + 1;
-  char* p_string = malloc(tens * sizeof(char));
+  char* p_string = malloc((tens + 1) * sizeof(char));
   assert(p_string);
   sprintf(p_string, "%d", number);
   return p_string;
