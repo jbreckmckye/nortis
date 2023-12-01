@@ -80,6 +80,8 @@ cmake --build ./build
 
 To rebuild, clear build dir and re-run commands above
 
+For VSCode, configure the `includePath` in the C/C++ plugin to include `C:\PSn00bSDK/include/libpsn00b` - this enables intellisense for PSX headers
+
 ### Showing the PSX logo
 
 Classic PSX games boot in two stages: first they show the Sony Computer Entertainment screen, then the classic PSX logo. But our example project doesn't. Why is that?
