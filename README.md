@@ -90,3 +90,10 @@ in effect.
 MKPSXISO supports loading in a license file (i.e. extracted from a retail game via DUMPSXISO), but for the sake of copyright we have to gitignore it.
 
 If we rebuild with a license_data.dat we get the classic splash screen
+
+### Building on windows
+
+Because PSn00bSDK targets windows (and I'm using a windows emulator), I do my scripting for PSX projects with PowerShell. What's the extension of a powershell script?
+Why, it's `.ps1`, of course!
+
+There's a `build.ps1` file added to the project that can be executed by right clicking in Explorer
