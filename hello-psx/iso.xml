@@ -44,7 +44,7 @@
 			PSn00bSDK for obvious reasons, but can be dumped from an official
 			game using dumpsxiso or extracted from the Sony SDK.
 		-->
-		<!--<license file="${PROJECT_SOURCE_DIR}/license_data.dat" />-->
+		<license file="${PROJECT_SOURCE_DIR}/license_data.dat" />
 
 		<!--
 			Files and directories can be added to the disc by placing <file>
