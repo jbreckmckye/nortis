@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <psxgpu.h>
 
+// Consult https://psx.arthus.net/sdk/Psy-Q/DOCS/Devrefs/Libref.pdf and 
+// https://psx.arthus.net/sdk/Psy-Q/DOCS/Devrefs/Libovr.pdf for Psy-Q functions,
+// many are equivalent to PSn00bSDK
+
 // Set up dual buffer rendering
 // "The display area is a rectangular section of the frame buffer used to display the video image"
 // "The drawing environment contains general information related to two-dimensional primitive drawing, such
@@ -57,14 +61,29 @@ int main(int argc, const char **argv) {
   PutDispEnv(&display_env[0]);
   PutDrawEnv(&draw_env[0]);
 
+  // Load the debug font texture into VRAM at x400,y0 and CLUT (colour lookup table) +128 px below
+  FntLoad(960, 0);
+
+  // Create a print stream. Coords are view-env relative. Returns id in case multiple streams required (max 8)
+  int printStream = FntOpen(
+    20, 20,           // int x, int y
+    300, 220,         // int w, int h
+    0,                // int isbg - clears background behind print stream rect
+    80                // int n - max chars
+  );
+
   // Remove the display mask that was set by ResetGraph()
   SetDispMask(1);
 
   // Render loop
   while (1) {
-    // Wait for the GPU to finish any pending work
-    DrawSync(0);
+    // Draw text into stream rect. Text is always printed in UPPERCASE
+    FntPrint(printStream, "Hello PlayStation!!!");
+    // Flush stream rect into draw env
+    FntFlush(printStream);
 
+    // Wait for the GPU to finish any pending work before sending to video
+    DrawSync(0);
     // Wait for video signal to reach end of frame (Vertical Sync)
     VSync(0);
 
