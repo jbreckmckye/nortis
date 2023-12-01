@@ -7,3 +7,6 @@ node_modules
 
 # C program
 *.out
+
+# PSX license data file, don't commit!
+license_data.dat
