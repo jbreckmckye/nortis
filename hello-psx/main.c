@@ -98,19 +98,28 @@ int main(int argc, const char **argv) {
   SetDispMask(1);
 
   // Tile position (from top left origin)
-  int x = 160 - BOX_RADIUS;
+  int x = 120 - BOX_RADIUS;
   int y = 120 - BOX_RADIUS;
+  int width = BOX_RADIUS * 2;
   int dx = 1;
+  int dy = 1;
 
   // Render loop
   while (1) {
     // Update state
     if (x <= 0) {
       dx = 1;
-    } else if (x + (BOX_RADIUS * 2) >= 320) {
+    } else if (x + width >= 320) {
       dx = -1;
     }
     x += dx;
+
+    if (y <= 0) {
+      dy = 1;
+    } else if (y + width >= 240) {
+      dy = -1;
+    }
+    y += dy;
 
     // DRAWING A PRIMITIVE
     // ------------------------------------------------------------------------------------------------------
@@ -127,15 +136,32 @@ int main(int argc, const char **argv) {
     TILE* p_tile = (TILE*)p_nextPacket;
     setTile(p_tile);
     setXY0 (p_tile, x, y);
-    setWH  (p_tile, BOX_RADIUS * 2, BOX_RADIUS * 2);
+    setWH  (p_tile, width, width);
     setRGB0(p_tile, 252, 186, 3);
 
-    // Link into ordering table (at z-level 2)
+    // Link into ordering table (z level 0)
     // int z = 2;
     // uint32_t* p_ordering_entry = &ordering_table[buffer_id][z];
     addPrim(ordering_table[buffer_id], p_nextPacket);
 
     // Then advance buffer
+    p_nextPacket += sizeof(TILE);
+
+    // ANOTHER PRIMITIVE (BEHIND THE OTHER)
+    // ------------------------------------------------------------------------------------------------------
+    int mirrorX = 320 - width - x;
+    int mirrorY = 240 - width - y;
+
+    TILE* p_tile2 = (TILE*)p_nextPacket;
+    setTile(p_tile2);
+    setXY0 (p_tile2, mirrorX, mirrorY); // moves in reverse direction to tile 1
+    setWH  (p_tile2, width, width);
+    setRGB0(p_tile2, 252, 32, 3);
+
+    // Link into ordering table, behind tile 1 (z-level 1)
+    addPrim(&ordering_table[buffer_id][1], p_nextPacket);
+
+    // Again increment buffer watermark
     p_nextPacket += sizeof(TILE);
 
     // DRAWING DEBUG TEXT
