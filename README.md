@@ -99,3 +99,32 @@ Because PSn00bSDK targets windows (and I'm using a windows emulator), I do my sc
 Why, it's `.ps1`, of course!
 
 There's a `build.ps1` file added to the project that can be executed by right clicking in Explorer
+
+### Drawing
+
+Setup and text http://lameguy64.net/tutorials/pstutorials/chapter1/1-display.html
+Drawing and gfx http://lameguy64.net/tutorials/pstutorials/chapter1/2-graphics.html
+
+Basic idea is that the 3D maths, projections etc are handled by a coprocessor called the Geometry Transform Engine, before
+the CPU sends "packets" to the GPU to actually go and render / rasterise primitive shapes at particular locations.
+
+Packets are arranged in RAM using an ordering table. This initialises to a simple linked list of n pointers. Primitives are added by inserting structs into the linked list
+
+```
+START:
+
+[Front of screen] --> 0 --> 1 --> 2 --> [Back of screen]
+
+LINKED:
+
+0 --               --> 1 --                              --> 2
+    \- [Shape 1] -/        \- [Shape 2] --> [Shape 3] --/
+```
+
+The list starts from the back of the screen and proceeds to the front; this provides a simple approach to occlusion / 'visibility problem'. The position in the ordering table is analogous to a z-coordinate.
+
+Because primitives need to live longer than the functions that declare them, they need to be initialised in a global buffer instead of the stack. (Otherwise functions returning / entering would overwrite the stack memory). The PSX BIOS and SDKs support heap allocations via `malloc` but are buggy and almost never used.
+
+Each primitive can be between 3 to 13 words (each word is 4 bytes as the PSX is 32 bit). Generally the primitive buffers can just be declared as arrays of `char` and then the programmer uses `sizeof` and pointer arithmetic to work with the memory. The SDK I'm using provides several macros to help with setting up primitives.
+
+Generally two ordering tables and primitive buffers are kept in memory, for the same reason two graphics buffers support performance. One set primitives / linked list can be drawn whilst the other is being prepared for the next frame.
