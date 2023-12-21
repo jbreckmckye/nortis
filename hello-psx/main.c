@@ -14,11 +14,14 @@
 // GLOBAL STATE (GFX BUFFERS)
 // ------------------------------------------------------------------------------------------------------
 
+char* helloMsg = "Hello PlayStation 1 !!!";
+
 // Set up dual buffer rendering
 // "The display area is a rectangular section of the frame buffer used to display the video image"
 // "The drawing environment contains general information related to two-dimensional primitive drawing, such
 //  as the position of the drawing area and the drawing offset."
-// We set up two of each
+// Shapes --[drawn into]--> Drawing area --[switched into]--> Display area --[blitted out]--> Video
+// We set up two of each to switch back and forth between frames using PutDispEnv and PutDrawEnv
 DISPENV display_env[2];
 DRAWENV draw_env[2];
 int buffer_id = 0;
@@ -29,6 +32,7 @@ uint32_t ordering_table[2][OT_LENGTH];
 uint8_t packets[2][BUFFER_LENGTH];
 uint8_t* p_nextPacket;
 
+// Args aren't typically set. At least they aren't set by the PSX kernel. Though they could be set by crt0 (runtime code prepended by linker)
 int main(int argc, const char **argv) {
   // INITIALISING GRAPHICS
   // ------------------------------------------------------------------------------------------------------
@@ -73,7 +77,7 @@ int main(int argc, const char **argv) {
 
   // Applies the display and draw envs to the GPU
   // Because the display and draw env y positions are inverted, we can use the same
-  // index for setting both
+  // index for setting both :)
   PutDispEnv(&display_env[0]);
   PutDrawEnv(&draw_env[0]);
 
@@ -121,10 +125,10 @@ int main(int argc, const char **argv) {
     }
     y += dy;
 
-    // DRAWING A PRIMITIVE
+    // DRAWING A PRIMITIVE (YELLOW BLOCK)
     // ------------------------------------------------------------------------------------------------------
 
-    // Reset nextPrimitive to point to start of current primitive buffer
+    // Reset nextPrimitive to point to start of the *current* primitive buffer
     p_nextPacket = packets[buffer_id];
 
     // Reset ordering table
@@ -139,10 +143,9 @@ int main(int argc, const char **argv) {
     setWH  (p_tile, width, width);
     setRGB0(p_tile, 252, 186, 3);
 
-    // Link into ordering table (z level 0)
-    // int z = 2;
-    // uint32_t* p_ordering_entry = &ordering_table[buffer_id][z];
-    addPrim(ordering_table[buffer_id], p_nextPacket);
+    // Link into ordering table (z level 2)
+    int z = 2;
+    addPrim(ordering_table[buffer_id] + z, p_nextPacket);
 
     // Then advance buffer
     p_nextPacket += sizeof(TILE);
@@ -158,8 +161,9 @@ int main(int argc, const char **argv) {
     setWH  (p_tile2, width, width);
     setRGB0(p_tile2, 252, 32, 3);
 
-    // Link into ordering table, behind tile 1 (z-level 1)
-    addPrim(&ordering_table[buffer_id][1], p_nextPacket);
+    // Link into ordering table, behind tile 1 (z-level 3)
+    // This would also be ordered behind tile 1 if we re-used z-level=2
+    addPrim(ordering_table[buffer_id] + z + 1, p_nextPacket);
 
     // Again increment buffer watermark
     p_nextPacket += sizeof(TILE);
@@ -168,7 +172,7 @@ int main(int argc, const char **argv) {
     // ------------------------------------------------------------------------------------------------------
 
     // Draw text into stream rect. Text is always printed in UPPERCASE
-    FntPrint(printStream, "Hello PlayStation 1 !!!");
+    FntPrint(printStream, helloMsg);
     // Flush stream rect into draw env
     FntFlush(printStream);
 

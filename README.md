@@ -121,7 +121,9 @@ LINKED:
     \- [Shape 1] -/        \- [Shape 2] --> [Shape 3] --/
 ```
 
-The list starts from the back of the screen and proceeds to the front; this provides a simple approach to occlusion / 'visibility problem'. The position in the ordering table is analogous to a z-coordinate.
+The ordering table is a reverse linked list. In memory it starts with the packets to display at the front of the screen, and ends with those furthest back, so that the
+index in the list is analogous to a z-index. However it is processed back-to-front to implement the "painter's algorithm". When the ordering table is ready it is processed
+with `DrawOTag()` passing the _last_ element.
 
 Because primitives need to live longer than the functions that declare them, they need to be initialised in a global buffer instead of the stack. (Otherwise functions returning / entering would overwrite the stack memory). The PSX BIOS and SDKs support heap allocations via `malloc` but are buggy and almost never used.
 
