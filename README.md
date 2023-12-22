@@ -130,3 +130,9 @@ Because primitives need to live longer than the functions that declare them, the
 Each primitive can be between 3 to 13 words (each word is 4 bytes as the PSX is 32 bit). Generally the primitive buffers can just be declared as arrays of `char` and then the programmer uses `sizeof` and pointer arithmetic to work with the memory. The SDK I'm using provides several macros to help with setting up primitives.
 
 Generally two ordering tables and primitive buffers are kept in memory, for the same reason two graphics buffers support performance. One set primitives / linked list can be drawn whilst the other is being prepared for the next frame.
+
+### Displaying a play piece
+
+### Displaying text
+
+Will just use debug font for now
