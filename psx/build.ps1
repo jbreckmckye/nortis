@@ -6,3 +6,5 @@ if (Test-Path $BUILD) {
 
 cmake --preset default .
 cmake --build ./build
+
+pause

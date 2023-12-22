@@ -111,14 +111,14 @@ the CPU sends "packets" to the GPU to actually go and render / rasterise primiti
 Packets are arranged in RAM using an ordering table. This initialises to a simple linked list of n pointers. Primitives are added by inserting structs into the linked list
 
 ```
-START:
+IN ARRAY:
 
 [Front of screen] --> 0 --> 1 --> 2 --> [Back of screen]
 
 LINKED:
 
-0 --               --> 1 --                              --> 2
-    \- [Shape 1] -/        \- [Shape 2] --> [Shape 3] --/
+0 --                -- 1 <--                                -- 2 <-- BEGINS FROM END 
+    \- [Shape 1] <-/         \- [Shape 2] <-- [Shape 3] <--/
 ```
 
 The ordering table is a reverse linked list. In memory it starts with the packets to display at the front of the screen, and ends with those furthest back, so that the
