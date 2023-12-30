@@ -1,14 +1,16 @@
-# Notris, a game for web, MacOS and PSOne
+# Notris: a block puzzle game for PSOne
 
-Tetris-like game for multiple platforms.
+Notris is a familiar (but legally distinct!) block puzzle game for the PlayStation 1. It's written in C using PSnoobSDK.
 
-The following notes will be written up into a blog post...
+This repo contains builds for three platforms:
 
-Progress:
+- ✅ a JavaScript prototype using `<canvas>`
+- ✅ a MacOS C port using SDL
+- ⏳ a PlayStation 1 game
 
-- ✅ Web with `<canvas>`
-- ✅ MacOS with C and SDL2
-- ⏳ PlayStation 1 with C
+# Notes (WIP)
+
+The following are rough notes that will be written up into a blog post
 
 ## JavaScript with canvas
 
