@@ -47,6 +47,11 @@ Explainer for the gcc flags
 
 Set `MallocStackLogging=1` to use `leaks` cmd
 
+Dev notes
+
+- generating tetronimos using numbers
+- generating colours using JS
+
 ## PlayStation 1
 
 ### Setting up dev environment
@@ -131,8 +136,20 @@ Each primitive can be between 3 to 13 words (each word is 4 bytes as the PSX is 
 
 Generally two ordering tables and primitive buffers are kept in memory, for the same reason two graphics buffers support performance. One set primitives / linked list can be drawn whilst the other is being prepared for the next frame.
 
-### Displaying a play piece
-
 ### Displaying text
 
-Will just use debug font for now
+There is a basic debug text utility embedded in the SDK, but it looks very rough and basic. Instead I opted to create a TIM format texture from some PNG pixel art. I wasn't completely happy with how this looked, but I didn't want to focus all my energy on just displaying text.
+
+You can see the debug and TIM fonts in the image below:
+
+![screenshot](psx-font.png)
+
+### Displaying a play piece
+
+todo
+
+### Controller input
+
+todo
+
+### Integraton
