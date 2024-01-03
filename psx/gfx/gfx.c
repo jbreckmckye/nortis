@@ -61,6 +61,64 @@ void gfx_loadFontTexture(TIM_IMAGE* p_tim) {
   loadTexture(tim_font, p_tim);
 }
 
+static void cmdTexture(TIM_IMAGE* p_tim, int zIndex) {
+  uint32_t* p_orderTable = ctx.buffers[ctx.buffer_id].ordering_table;
+
+  // Some complex math thing macro to get texture page coordinates
+  uint16_t tPage = getTPage(
+    p_tim->mode & 0x3, // 00,01,10,11 -> sets bpp mode
+    0,
+    p_tim->prect->x, // pixel data rect
+    p_tim->prect->y  // pixel data rect
+  );
+
+  // Chomp from primitive buffer
+  DR_TPAGE* p_setTexture = (DR_TPAGE*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(DR_TPAGE);
+
+  setDrawTPage(p_setTexture, 0, 0, tPage);
+  addPrim(p_orderTable + zIndex, p_setTexture);
+}
+
+static void cmdCharacterSprite(int x, int y, int charCode, int zIndex) {
+  uint32_t* p_orderTable = ctx.buffers[ctx.buffer_id].ordering_table;
+
+  // Chomp from primitive buffer
+  SPRT* p_sprite = (SPRT*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(SPRT);
+
+  int charIndex = charCode - 32;
+  if (charIndex < 0 || charIndex > 64) {
+    printf("Bad character %d\n", charCode);
+    charIndex = 0;
+  }
+
+  int u = (charIndex % 8) * 8;
+  int v = (charIndex / (int)8) * 8;
+
+  setSprt(p_sprite);
+  setXY0(p_sprite, x, y);
+  setWH0(p_sprite, 8, 8);
+  setUV0(p_sprite, u, v);
+  setClut(p_sprite, tim_font->crect->x, p_tim->crect->y);
+  setRGB0(p_sprite, 128, 128, 128);
+
+  addPrim(p_orderTable + zIndex, p_sprite);
+}
+
+static void drawFontString(int x, int y, char* string, int zIndex) {
+  int i = 0;
+  char next = string[i];
+  while (next) {
+    int charX = x + (i * 8);
+    cmdCharacterSprite(charX, y, next, zIndex);
+    next = string[++i];
+  }
+
+  // Must insert this later than the textured primitives as cmds processed in reverse
+  cmdTexture(p_tim, zIndex);
+}
+
 void gfx_showFontTexture(TIM_IMAGE* p_tim) {
   uint32_t* ordering_table = ctx.buffers[ctx.buffer_id].ordering_table;
 
