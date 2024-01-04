@@ -24,6 +24,8 @@ int main(int argc, char** argv) {
   while (1) {
     gfx_showFontTexture(&tim);
 
+    gfx_drawFontString(200, 200, "HELLO", 0);
+
     framecount++;
     framecount = framecount % 60;
     // Write into debug text printstream & flush into drawing environment

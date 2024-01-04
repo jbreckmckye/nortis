@@ -13,10 +13,10 @@
  * - The primitives / commands buffer (which is cleared every frame)
  */
 typedef struct {
-  DISPENV display_env;
-  DRAWENV draw_env;
-  uint32_t ordering_table[OT_SIZE];
-  uint8_t primitives_buffer[PACKETS_SIZE];
+  DISPENV displayEnv;
+  DRAWENV drawEnv;
+  uint32_t orderingTable[OT_SIZE];
+  uint8_t primitivesBuffer[PACKETS_SIZE];
 } RenderBuffer;
 
 /* The RenderContext is a global handle on all the graphics buffers.
@@ -24,7 +24,7 @@ typedef struct {
  * The p_primitive points to the next unused byte in the current primitives buffer
  */
 typedef struct {
-  int buffer_id;
+  int bufferID;
   uint8_t* p_primitive; // next primitive
   RenderBuffer buffers[2];
 } RenderContext;
