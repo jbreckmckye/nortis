@@ -7,6 +7,6 @@ void gfx_init();
 void gfx_endFrame();
 
 /* WIP: Render font texture */
-void gfx_loadFontTexture(TIM_IMAGE* p_tim);
-void gfx_showFontTexture(TIM_IMAGE* p_tim);
+void gfx_loadFontTexture();
+void gfx_showFontTexture();
 void gfx_drawFontString(int x, int y, char* string, int zIndex);

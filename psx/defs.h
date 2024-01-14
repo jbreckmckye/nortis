@@ -6,6 +6,8 @@
 #define PACKETS_SIZE 8192
 #define SCREEN_W 320
 #define SCREEN_H 240
+#define FONT_ROW_LENGTH 16
+#define FONT_GLYPH_SIZE 16
 
 /* The RenderBuffer contains multiple buffers associated with graphics:
  * - The display and draw environments

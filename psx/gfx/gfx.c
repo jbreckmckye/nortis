@@ -14,7 +14,7 @@ static const char* CONTROL_MOVE = "() MOVE, & ROTATE";
 static const char* CONTROL_DROP = "' FAST DROP";
 static const char* SCORE = "SCORE";
 static const char* RESTART = "[START] TO RESTART";
-static const char* KREDITS = "2024 JBRECKMCKYE + PSNOOBSDK ^_^"
+static const char* KREDITS = "2024 JBRECKMCKYE + PSNOOBSDK ^_^";
 
 extern const uint32_t tim_font[];
 extern const size_t tim_font_size;
@@ -105,12 +105,12 @@ static void cmdCharacterSprite(int x, int y, int charCode, int zIndex) {
     charIndex = 0;
   }
 
-  int u = (charIndex % 8) * 8;
-  int v = (charIndex / (int)8) * 8;
+  int u = (charIndex % FONT_ROW_LENGTH) * FONT_GLYPH_SIZE;
+  int v = (charIndex / (int)FONT_ROW_LENGTH) * FONT_GLYPH_SIZE;
 
   setSprt(p_sprite);
   setXY0(p_sprite, x, y);
-  setWH0(p_sprite, 8, 8);
+  setWH(p_sprite, FONT_GLYPH_SIZE, FONT_GLYPH_SIZE);
   setUV0(p_sprite, u, v);
   setClut(p_sprite, g_font.crect->x, g_font.crect->y);
   setRGB0(p_sprite, 128, 128, 128);
@@ -118,11 +118,11 @@ static void cmdCharacterSprite(int x, int y, int charCode, int zIndex) {
   addPrim(p_orderTable + zIndex, p_sprite);
 }
 
-static void gfx_drawFontString(int x, int y, char* string, int zIndex) {
+void gfx_drawFontString(int x, int y, char* string, int zIndex) {
   int i = 0;
   char next = string[i];
   while (next) {
-    int charX = x + (i * 8);
+    int charX = x + (i * FONT_GLYPH_SIZE);
     cmdCharacterSprite(charX, y, next, zIndex);
     next = string[++i];
   }

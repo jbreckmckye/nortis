@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   while (1) {
     gfx_showFontTexture(&tim);
 
-    gfx_drawFontString(200, 200, "HELLO", 0);
+    gfx_drawFontString(FONT_GLYPH_SIZE, 160, "PSX LIVES 2024 $", 0);
 
     framecount++;
     framecount = framecount % 60;
