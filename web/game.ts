@@ -7,7 +7,7 @@ import { randomBlock } from './blocks'
  *
  * This code is a prototype for the SDL and PlayStation versions we will
  * write in C. As such we avoid using too many high-level language features,
- * and stick mostly to things we can port to C without trouble.
+ * and stick to a much more procedural style that will port easily to C.
  */
 
 // First 2 rows are hidden to provide space for pieces to spawn in

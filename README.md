@@ -12,22 +12,118 @@ This repo contains builds for three platforms:
 
 The following are rough notes that will be written up into a blog post
 
-## JavaScript with canvas
+## Motives and background
 
-`yarn dev-web`
+Last year I managed to get my hands on a very rare, black PlayStation 1. This is the Net Yaroze and it allowed ordinary
+consumers to write their own, basic PSOne games. Yaroze games were a little limited, they had to fit completely within
+system RAM, but there sprung up a small yet dedicated fandom of indie developers writing their own PSOne games in the 
+1990s.
 
-The first implementation is a prototype in a high-level language. Working in JavaScript means we can quickly build an
-idea of the overall approach, before moving to C and the more involved SDKs.
+But now I had my own, and it got me thinking - what does it take to write a PlayStation game?
 
-Although we're working in JS, we avoid availing ourselves of many high level language features like closures, higher
-order functions, or object orientation. The code is meant to resemble the C code we will write later for MacOS and
-PlayStation.
+This is about how I wrote my own, simple Tetris clone for the PSX, using open-source versions of the PSOne SDK but
+still running on original hardware and written in 90s-style C. The game is simple, just a 2D puzzle game without any
+audio, but I'm proud I made something real and running on an actual PlayStation. [Note - this is written from a future
+perspective : D]
 
-## MacOS with C and SDL2
+## How did they do it in the 90s?
+
+The Sony PlayStation devkit was basically an expansion card you slotted into your PC. It used the old ISA standard and
+the software all ran on Windows 95. All the SDKs (software development kits) were based around the C programming language;
+almost every PSOne game was written in C.
+
+Now I came into this project not having ever written any C, and being slightly intimidated by it. Most of my professional
+programming experience has been in much higher level languages like JavaScript and Haskell. I'd done a little C++ but
+modern C++ is so far from 90s C that they're practically different languages. How would I bridge this gap in my skills?
+
+## Breaking down the problem
+
+I figured I could make this project work by breaking into three smaller problems.
+
+First, I would write a prototype of my game in a language I knew. In this case JavaScript with HTML5 canvas. This would
+give me a skeleton of the eventual code.
+
+Second, I would rewrite the game in C, as a MacOS native app. This would be how I'd learn C.
+
+Finally, I would port that game to the PlayStation. I would only need to rewrite the parts specific to the PlayStation,
+and not get distracted by the new programming language.
+
+## Part 1: JavaScript with HTML5 canvas
+
+So the first step was a prototype in a high level language. Working in JavaScript means we can move quickly and build
+an idea of the overall approach. JS is a much more forgiving language than C.
+
+I'd never actually written a Tetris game and it turns out there is some nuance to it. Tetris jargon is full of terms
+like 'wall kicks', 't spins' and other mechanics that all needed to be implemented by my port.
+
+Although I was working in JavaScript, I tried to avoid leaning on any higher level language features, that I knew I
+would no longer have working in C. That meant no object orientation, no closures, no functional programming - just 
+a very simple and procedural style.
+
+(You can run the prototype in this project with `yarn dev-web`)
+
+## Part 2: MacOS with C and SDL2
+
+I came into this project rather intimidated by C. I'd heard horror stories of dangling pointers, misaligned bytes,
+segfaulting reads and Heisenbugs so complex even Dijkstra himself wouldn't untangle them. I really had nothing to
+fear. Learning C was incredible fun.
+
+It's a bit of an exaggeration to say that C "teaches you how the computer works" (link: Your Computer Is Not a
+Fast PDP-11), but there is definitely a simplicity to its mental model, that I found really compelling.
+
+For example, for my Tetronimos, I needed an easy way to define a grid of blocks for each shape. In JavaScript I
+did this with dynamic arrays, but C isn't kind to dynamic programming. But a different way to think about a grid
+is as a set of zeroes and ones. And a way to store zeroes and ones in C is by declaring numbers. That meant I
+could use numbers to declare the pattern of blocks inside a Tetronimo.
+
+```c
+/**
+ * blocks.c
+ * ================================================================================================
+ * Blocks are stored using a hex number scheme described in https://stackoverflow.com/a/38596291,
+ * of 16 bits (4 by 4 rows).  This allows us to very compactly define custom rotation systems.
+ * 
+ * Bits can be addressed by masking from 0x8000 (GRID_BIT_OFFSET) for the first bit, then shifting
+ * right for subsequent bits.
+ * 
+ * Example:
+ * 
+ * A 2x2 block translated into bits
+ * 
+ * XX.. -> 1100
+ * XX.. -> 1100
+ * .... -> 0000
+ * .... -> 0000
+ * 
+ * binary= 0b1100110000000000
+ * hexdml= 0xCC00
+ * 
+ * To get row 1 = 0xCC00 & (0x0F00)
+ *        row 2 = 0xCC00 & (0x0F00 >> 1)
+ *        etc.
+ * 
+ * Or to get x/y = 0xCC00 & (0x8000 >> ((y * 4) + x))
+ * ================================================================================================
+ */
+
+static shapeHex shapeHexes[8][4] = {
+  { 0 },                              // EMPTY   
+  { 0x0F00, 0x4444, 0x0F00, 0x4444 }, // I
+  { 0xE200, 0x44C0, 0x8E00, 0xC880 }, // J
+  { 0xE800, 0xC440, 0x2E00, 0x88C0 }, // L
+  { 0xCC00, 0xCC00, 0xCC00, 0xCC00 }, // O
+  { 0x6C00, 0x8C40, 0x6C00, 0x8C40 }, // S
+  { 0x0E40, 0x4C40, 0x4E00, 0x4640 }, // T
+  { 0x4C80, 0xC600, 0x4C80, 0xC600 }, // Z
+};
+```
+
+I liked this aspect of C a lot. You think about ranges of bytes and very basic computer state. From there you
+layer up and layer up abstractions until you've built an entire application, right from bare primitives
+
+### Running it yourself
 
 `yarn build-macos && yarn run-macos`
-
-This should compile for windows / Linux too, but I haven't tried it.
 
 We're using SDL2 with the TTF font extension. These need to be installed on the system:
 
@@ -41,7 +137,7 @@ Build command is
 gcc hello.c `sdl2-config --libs` -lm -lSDL2_ttf
 ```
 
-Explainer for the gcc flags
+Explainer for the gcc flags (as I had to learn)
 
 - subshell for `sdl2-config --libs` generates handy linker arguments `-L/usr/local/lib -lSDL2`
 - `-lm` links the math library
