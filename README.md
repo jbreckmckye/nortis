@@ -32,6 +32,8 @@ The Sony PlayStation devkit was basically an expansion card you slotted into you
 the software all ran on Windows 95. All the SDKs (software development kits) were based around the C programming language;
 almost every PSOne game was written in C.
 
+https://www.retroreversing.com/official-playStation-devkit
+
 Now I came into this project not having ever written any C, and being slightly intimidated by it. Most of my professional
 programming experience has been in much higher level languages like JavaScript and Haskell. I'd done a little C++ but
 modern C++ is so far from 90s C that they're practically different languages. How would I tackle this project?
@@ -40,46 +42,42 @@ modern C++ is so far from 90s C that they're practically different languages. Ho
 
 I figured I could break the problem into three smaller steps.
 
-First, I would write a prototype of my game in a high-level language I knew well. In this case JavaScript with HTML5 canvas.
-This would give me a skeleton of the eventual code.
-
-Second, I would rewrite this game as a native PC or Mac game, using C. That would allow me to learn the basics of the
-language by porting functions and systems from the JavaScript.
-
-Finally, I would port that game to the PlayStation 1. My game would already be written to work in C89, so the last step
-would just be to learn specifics of the PSOne.
+1. Write a prototype in a high level language, to figure out the basic Tetris program
+2. Port the prototype to a native PC/Mac game, learning C as I went along
+3. Port that C game again to the PSOne, using an open source SDK
 
 ## Part 1: JavaScript with HTML5 canvas
 
-Starting in JavaScript meant I could move quickly and build an idea of the overall approach. JS is a much more forgiving
-language than C, and relatively concise.
+I figured the best place to start was a prototype in JavaScript. JS is a very forgiving, concise language, and `<canvas>`
+gives us a very basic but accessible graphics API.
 
-I'd never actually written a Tetris game and it turns out there is some nuance to it. After researching the Tetris wiki
-(there is one) and things like 'wall kicks' and 'T spins' I had a pretty decent version of the game.
+Although I was working in JS, I tried to avoid leaning on any higher level language features. I wanted the port to C to
+be as straightforward as possible, so I stayed away from any functional programming, object orientation or dynamic typing.
+I stuck to a very procedural subset of JS, with mostly static memory.
 
-Although I was working in JavaScript, I tried to avoid leaning on any higher level language features. I wanted the code
-to resemble what I would eventually be writing in C. That meant no object orientation, no functional programming or
-closures - a very simple and procedural style.
+Writing the prototype took longer than I expected! There's actually some depth to Tetris mechanics, and it took some fair
+tweaking before the game felt 'right'. I was pleased with having something playable, but I was a long way from "Notris"
+on the PSX.
 
 (You can run the prototype in this project with `yarn dev-web`)
 
 ## Part 2: MacOS with C and SDL2
 
-I actually had an ulterior motive in this project: I wanted to finally learn C. As someone coming from much higher
+I actually had an ulterior motive in this project: to finally learn C. As someone coming from much higher
 level languages I had something of an inferiority complex about it. C has an intimidating reputation and I feared
 horror stories of dangling pointers, misaligned bytes and the dreaded segfault.
 
 Actually, working in C was incredibly fun and I really fell in love with the simplicity of its mental model. You
-start from basic primitives like structs and bytes and build things up to create an entire working system. Like
-making a Big Mac from scratch, it feels empowering to know every part of it was your own effort - and it usually
-tastes better, too.
+start from basic primitives like structs and bytes and build things up to create an entire working system. A bit
+like cooking your own Big Mac from scratch, it feels empowering to know every part of it was your own effort - and
+it usually tastes better, too.
 
-The MacOS game took a few days to port, and I was very satisfied to finally have a native version running.
+The MacOS game took a few days to port, and I was very satisfied with my first C project. And I hadn't had a single
+segfault!
 
-One thing I haven't mentioned about PSX programming is the memory aspect. Obviously you don't have a lot of RAM
-(just 2MB on a consumer model). But you also don't really have a heap, as the `malloc` that ships with
-the runtime is completely broken. Unless you want to write your own allocator, PSX games stick to static memory,
-and I tried to do the same on MacOS.
+SDL2 was pretty easy to work with, but there were a few aspects that required me to allocate memory dynamically.
+This would be a no-no on the PlayStation, where the `malloc` provided by the PSX kernel doesn't even work properly.
+And the graphics pipeline would be a new experience entirely...
 
 ### Running it yourself
 
@@ -97,7 +95,7 @@ Build command is
 gcc hello.c `sdl2-config --libs` -lm -lSDL2_ttf
 ```
 
-Explainer for the gcc flags (as I had to learn)
+Explainer for the gcc flags
 
 - subshell for `sdl2-config --libs` generates handy linker arguments `-L/usr/local/lib -lSDL2`
 - `-lm` links the math library
@@ -204,10 +202,55 @@ You can see the debug and TIM fonts in the image below:
 
 ### Displaying a play piece
 
-todo
+todo - polygonal graphics, gourad shading
 
 ### Controller input
 
-todo
+PSOne controllers are somewhat complex. There are many types (lightguns, mice, analog, digital, multitaps) and a mixture of APIs for accessing them. For most purposes it's fine to use PSNoobSDK's `StartPAD` and `InitPAD`
+functions. These will poll the controllers every frame (vsync) and copy state into a buffer you provide. The actual button data is provided as a map of 16 bits, though curiously the bits are all inverted
+(i.e. they're 1 when unpressed)
 
-### Integraton
+```c
+// 2x ports, 34 bytes for each (each port may have a 4 controller multitap)
+char joypads[2][34];
+
+// Tell BIOS to pass data into these buffers
+InitPAD(joypads[0], 34, joypads[1], 34);
+
+// Poll every vsync
+StartPAD();
+
+// Handle PSX kernel bug where StartPAD() blocks VSync() due to re-enabling vsync interrupts
+ChangeClearPAD(1);
+
+while (true) {
+  // ...Somewhere in render loop
+
+  // Check joy 1 connected
+  if (joypads[0][0] == 0) {
+    // Use PSNoobSDK PADTYPE for convenience
+    p_pad = (PADTYPE*) joypads[0];
+
+    // Check digital pad
+    if (p_pad->type == 0x04) {
+      // Button bits are inverted
+      uint16_t pressed = ~ (p_pad->btn);
+
+      // Mask bits to get pressed buttons
+      if (pressed & PAD_CIRCLE) {
+        printf("You pressed Circle!\n");
+      } else {
+        // et cetera
+      }
+    }
+  }
+}
+```
+
+### Creating a UI
+
+### Porting the game code
+
+### Everything together
+
+### Running on PlayStation
