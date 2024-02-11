@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <psxgpu.h>
+#include <psxapi.h>
+#include <psxpad.h>
 
 #define BOX_RADIUS 16
 #define OT_LENGTH 16
@@ -31,6 +33,9 @@ int buffer_id = 0;
 uint32_t ordering_table[2][OT_LENGTH];
 uint8_t packets[2][BUFFER_LENGTH];
 uint8_t* p_nextPacket;
+
+// Buffer for controller input. 2 controller ports, 34 bytes each to support 4 controllers in a multitap
+char joypads[2][34] = { 0xFF };
 
 // Args aren't typically set. At least they aren't set by the PSX kernel. Though they could be set by crt0 (runtime code prepended by linker)
 int main(int argc, const char **argv) {
@@ -95,6 +100,15 @@ int main(int argc, const char **argv) {
     80                // int n - max chars
   );
 
+  // INITIALISE JOYPADS
+  // ------------------------------------------------------------------------------------------------------
+  InitPAD(joypads[0], 34, joypads[1], 34);
+  StartPAD(); // begins polling every vsync
+  ChangeClearPAD(1); // resolves issue where StartPad initially enables VSync interrupts, which causes the first VSync to time out
+
+  // 16 bit map of current joypad state
+  PADTYPE* p_pad;
+
   // RENDER LOOP
   // ------------------------------------------------------------------------------------------------------
 
@@ -108,9 +122,15 @@ int main(int argc, const char **argv) {
   int dx = 1;
   int dy = 1;
 
+  // Player tile position
+  int playerX = x;
+  int playerY = y;
+
   // Render loop
   while (1) {
-    // Update state
+    // UPDATE RED BLOCK LOCATION
+    // ------------------------------------------------------------------------------------------------------
+
     if (x <= 0) {
       dx = 1;
     } else if (x + width >= 320) {
@@ -125,7 +145,7 @@ int main(int argc, const char **argv) {
     }
     y += dy;
 
-    // DRAWING A PRIMITIVE (YELLOW BLOCK)
+    // DRAWING A PRIMITIVE (RED BLOCK)
     // ------------------------------------------------------------------------------------------------------
 
     // Reset nextPrimitive to point to start of the *current* primitive buffer
@@ -141,7 +161,8 @@ int main(int argc, const char **argv) {
     setTile(p_tile);
     setXY0 (p_tile, x, y);
     setWH  (p_tile, width, width);
-    setRGB0(p_tile, 252, 186, 3);
+    setRGB0(p_tile, 252, 32, 3);
+  
 
     // Link into ordering table (z level 2)
     int z = 2;
@@ -150,20 +171,46 @@ int main(int argc, const char **argv) {
     // Then advance buffer
     p_nextPacket += sizeof(TILE);
 
-    // ANOTHER PRIMITIVE (BEHIND THE OTHER)
+    // READ CONTROLLER AND UPDATE YELLOW BLOCK LOCATION
     // ------------------------------------------------------------------------------------------------------
-    int mirrorX = 320 - width - x;
-    int mirrorY = 240 - width - y;
+    // Pull from first pad in slot 1
+    p_pad = (PADTYPE *)joypads[0];
+    if (p_pad->stat == 0) { // check joy1 connected
+      if (p_pad->type == 0x04) {
+        uint16_t buttons = ~(p_pad->btn);
+        if (buttons & PAD_UP || buttons & PAD_TRIANGLE) {
+          playerY -= 2;
+          if (playerY < 0) playerY = 0;
+        }
+        if (buttons & PAD_DOWN || buttons & PAD_CROSS) {
+          playerY += 2;
+          if (playerY + width > 240) playerY = 240;
+        }
+        if (buttons & PAD_LEFT || buttons & PAD_SQUARE) {
+          playerX -= 2;
+          if (playerX < 0) playerX = 0;
+        }
+        if (buttons & PAD_RIGHT || buttons & PAD_CIRCLE) {
+          playerX += 2;
+          if (playerX + width > 320) playerX = 320;
+        }
+      } else {
+        printf("Joypad 1 not connected or not digital pad mode\n");
+      }
+    }
+
+    // ANOTHER PRIMITIVE (YELLOW BLOCK, IN FRONT OF THE OTHER) (PLAYER CONTROLLED)
+    // ------------------------------------------------------------------------------------------------------
 
     TILE* p_tile2 = (TILE*)p_nextPacket;
     setTile(p_tile2);
-    setXY0 (p_tile2, mirrorX, mirrorY); // moves in reverse direction to tile 1
+    setXY0 (p_tile2, playerX, playerY); // moves in reverse direction to tile 1
     setWH  (p_tile2, width, width);
-    setRGB0(p_tile2, 252, 32, 3);
+    setRGB0(p_tile2, 252, 186, 3);
 
-    // Link into ordering table, behind tile 1 (z-level 3)
-    // This would also be ordered behind tile 1 if we re-used z-level=2
-    addPrim(ordering_table[buffer_id] + z + 1, p_nextPacket);
+    // Link into ordering table, in front of tile 1 (z-level 1)
+    // If we re-used z=2 this would go behind (as it is put lastmost in that OT index, which means it's processed first)
+    addPrim(ordering_table[buffer_id] + z - 1, p_nextPacket);
 
     // Again increment buffer watermark
     p_nextPacket += sizeof(TILE);

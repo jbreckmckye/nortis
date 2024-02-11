@@ -34,92 +34,52 @@ almost every PSOne game was written in C.
 
 Now I came into this project not having ever written any C, and being slightly intimidated by it. Most of my professional
 programming experience has been in much higher level languages like JavaScript and Haskell. I'd done a little C++ but
-modern C++ is so far from 90s C that they're practically different languages. How would I bridge this gap in my skills?
+modern C++ is so far from 90s C that they're practically different languages. How would I tackle this project?
 
 ## Breaking down the problem
 
-I figured I could make this project work by breaking into three smaller problems.
+I figured I could break the problem into three smaller steps.
 
-First, I would write a prototype of my game in a language I knew. In this case JavaScript with HTML5 canvas. This would
-give me a skeleton of the eventual code.
+First, I would write a prototype of my game in a high-level language I knew well. In this case JavaScript with HTML5 canvas.
+This would give me a skeleton of the eventual code.
 
-Second, I would rewrite the game in C, as a MacOS native app. This would be how I'd learn C.
+Second, I would rewrite this game as a native PC or Mac game, using C. That would allow me to learn the basics of the
+language by porting functions and systems from the JavaScript.
 
-Finally, I would port that game to the PlayStation. I would only need to rewrite the parts specific to the PlayStation,
-and not get distracted by the new programming language.
+Finally, I would port that game to the PlayStation 1. My game would already be written to work in C89, so the last step
+would just be to learn specifics of the PSOne.
 
 ## Part 1: JavaScript with HTML5 canvas
 
-So the first step was a prototype in a high level language. Working in JavaScript means we can move quickly and build
-an idea of the overall approach. JS is a much more forgiving language than C.
+Starting in JavaScript meant I could move quickly and build an idea of the overall approach. JS is a much more forgiving
+language than C, and relatively concise.
 
-I'd never actually written a Tetris game and it turns out there is some nuance to it. Tetris jargon is full of terms
-like 'wall kicks', 't spins' and other mechanics that all needed to be implemented by my port.
+I'd never actually written a Tetris game and it turns out there is some nuance to it. After researching the Tetris wiki
+(there is one) and things like 'wall kicks' and 'T spins' I had a pretty decent version of the game.
 
-Although I was working in JavaScript, I tried to avoid leaning on any higher level language features, that I knew I
-would no longer have working in C. That meant no object orientation, no closures, no functional programming - just 
-a very simple and procedural style.
+Although I was working in JavaScript, I tried to avoid leaning on any higher level language features. I wanted the code
+to resemble what I would eventually be writing in C. That meant no object orientation, no functional programming or
+closures - a very simple and procedural style.
 
 (You can run the prototype in this project with `yarn dev-web`)
 
 ## Part 2: MacOS with C and SDL2
 
-I came into this project rather intimidated by C. I'd heard horror stories of dangling pointers, misaligned bytes,
-segfaulting reads and Heisenbugs so complex even Dijkstra himself wouldn't untangle them. I really had nothing to
-fear. Learning C was incredible fun.
+I actually had an ulterior motive in this project: I wanted to finally learn C. As someone coming from much higher
+level languages I had something of an inferiority complex about it. C has an intimidating reputation and I feared
+horror stories of dangling pointers, misaligned bytes and the dreaded segfault.
 
-It's a bit of an exaggeration to say that C "teaches you how the computer works" (link: Your Computer Is Not a
-Fast PDP-11), but there is definitely a simplicity to its mental model, that I found really compelling.
+Actually, working in C was incredibly fun and I really fell in love with the simplicity of its mental model. You
+start from basic primitives like structs and bytes and build things up to create an entire working system. Like
+making a Big Mac from scratch, it feels empowering to know every part of it was your own effort - and it usually
+tastes better, too.
 
-For example, for my Tetronimos, I needed an easy way to define a grid of blocks for each shape. In JavaScript I
-did this with dynamic arrays, but C isn't kind to dynamic programming. But a different way to think about a grid
-is as a set of zeroes and ones. And a way to store zeroes and ones in C is by declaring numbers. That meant I
-could use numbers to declare the pattern of blocks inside a Tetronimo.
+The MacOS game took a few days to port, and I was very satisfied to finally have a native version running.
 
-```c
-/**
- * blocks.c
- * ================================================================================================
- * Blocks are stored using a hex number scheme described in https://stackoverflow.com/a/38596291,
- * of 16 bits (4 by 4 rows).  This allows us to very compactly define custom rotation systems.
- * 
- * Bits can be addressed by masking from 0x8000 (GRID_BIT_OFFSET) for the first bit, then shifting
- * right for subsequent bits.
- * 
- * Example:
- * 
- * A 2x2 block translated into bits
- * 
- * XX.. -> 1100
- * XX.. -> 1100
- * .... -> 0000
- * .... -> 0000
- * 
- * binary= 0b1100110000000000
- * hexdml= 0xCC00
- * 
- * To get row 1 = 0xCC00 & (0x0F00)
- *        row 2 = 0xCC00 & (0x0F00 >> 1)
- *        etc.
- * 
- * Or to get x/y = 0xCC00 & (0x8000 >> ((y * 4) + x))
- * ================================================================================================
- */
-
-static shapeHex shapeHexes[8][4] = {
-  { 0 },                              // EMPTY   
-  { 0x0F00, 0x4444, 0x0F00, 0x4444 }, // I
-  { 0xE200, 0x44C0, 0x8E00, 0xC880 }, // J
-  { 0xE800, 0xC440, 0x2E00, 0x88C0 }, // L
-  { 0xCC00, 0xCC00, 0xCC00, 0xCC00 }, // O
-  { 0x6C00, 0x8C40, 0x6C00, 0x8C40 }, // S
-  { 0x0E40, 0x4C40, 0x4E00, 0x4640 }, // T
-  { 0x4C80, 0xC600, 0x4C80, 0xC600 }, // Z
-};
-```
-
-I liked this aspect of C a lot. You think about ranges of bytes and very basic computer state. From there you
-layer up and layer up abstractions until you've built an entire application, right from bare primitives
+One thing I haven't mentioned about PSX programming is the memory aspect. Obviously you don't have a lot of RAM
+(just 2MB on a consumer model). But you also don't really have a heap, as the `malloc` that ships with
+the runtime is completely broken. Unless you want to write your own allocator, PSX games stick to static memory,
+and I tried to do the same on MacOS.
 
 ### Running it yourself
 
