@@ -36,43 +36,6 @@ static void loadTexture(const uint32_t* p_data, TIM_IMAGE* p_parsedTim) {
   }
 }
 
-void gfx_init() {
-  ResetGraph(0);
-
-  RenderBuffer* p_buffer0 = &(ctx.buffers[0]);
-  RenderBuffer* p_buffer1 = &(ctx.buffers[1]);
-
-  DISPENV* p_dispEnv0 = &(p_buffer0->displayEnv);
-  DISPENV* p_dispEnv1 = &(p_buffer1->displayEnv);
-
-  DRAWENV* p_drawEnv0 = &(p_buffer0->drawEnv);
-  DRAWENV* p_drawEnv1 = &(p_buffer1->drawEnv);
-
-  // Arrange two framebuffers vertically. Display and draw environments are flipped.
-  SetDefDispEnv(p_dispEnv0, 0, 0, SCREEN_W, SCREEN_H);
-  SetDefDispEnv(p_dispEnv1, 0, SCREEN_H, SCREEN_W, SCREEN_H);
-  SetDefDrawEnv(p_drawEnv0, 0, SCREEN_H, SCREEN_W, SCREEN_H);
-  SetDefDrawEnv(p_drawEnv1, 0, 0, SCREEN_W, SCREEN_H);
-
-  // Autoclear every frame
-  setRGB0(p_drawEnv0, 0x03, 0x0A, 0x12);
-  setRGB0(p_drawEnv1, 0x03, 0x0A, 0x12);
-  p_drawEnv0->isbg = 1;
-  p_drawEnv1->isbg = 1;
-
-  // Initialise first renderbuffer
-  ctx.bufferID = 0;
-  ctx.p_primitive = p_buffer0->primitivesBuffer;
-  ClearOTagR(p_buffer0->orderingTable, OT_SIZE);
-
-  // Unmask video output
-  SetDispMask(1);
-}
-
-void gfx_loadFontTexture() {
-  loadTexture(tim_font, &g_font);
-}
-
 static void cmdTexture(TIM_IMAGE* p_tim, int zIndex) {
   uint32_t* p_orderTable = ctx.buffers[ctx.bufferID].orderingTable;
 
@@ -116,6 +79,43 @@ static void cmdCharacterSprite(int x, int y, int charCode, int zIndex) {
   setRGB0(p_sprite, 128, 128, 128);
 
   addPrim(p_orderTable + zIndex, p_sprite);
+}
+
+void gfx_init() {
+  ResetGraph(0);
+
+  RenderBuffer* p_buffer0 = &(ctx.buffers[0]);
+  RenderBuffer* p_buffer1 = &(ctx.buffers[1]);
+
+  DISPENV* p_dispEnv0 = &(p_buffer0->displayEnv);
+  DISPENV* p_dispEnv1 = &(p_buffer1->displayEnv);
+
+  DRAWENV* p_drawEnv0 = &(p_buffer0->drawEnv);
+  DRAWENV* p_drawEnv1 = &(p_buffer1->drawEnv);
+
+  // Arrange two framebuffers vertically. Display and draw environments are flipped.
+  SetDefDispEnv(p_dispEnv0, 0, 0, SCREEN_W, SCREEN_H);
+  SetDefDispEnv(p_dispEnv1, 0, SCREEN_H, SCREEN_W, SCREEN_H);
+  SetDefDrawEnv(p_drawEnv0, 0, SCREEN_H, SCREEN_W, SCREEN_H);
+  SetDefDrawEnv(p_drawEnv1, 0, 0, SCREEN_W, SCREEN_H);
+
+  // Autoclear every frame
+  setRGB0(p_drawEnv0, 0x05, 0x07, 0x33);
+  setRGB0(p_drawEnv1, 0x05, 0x07, 0x33);
+  p_drawEnv0->isbg = 1;
+  p_drawEnv1->isbg = 1;
+
+  // Initialise first renderbuffer
+  ctx.bufferID = 0;
+  ctx.p_primitive = p_buffer0->primitivesBuffer;
+  ClearOTagR(p_buffer0->orderingTable, OT_SIZE);
+
+  // Unmask video output
+  SetDispMask(1);
+}
+
+void gfx_loadFontTexture() {
+  loadTexture(tim_font, &g_font);
 }
 
 void gfx_drawFontString(int x, int y, char* string, int zIndex) {
@@ -201,4 +201,19 @@ void gfx_endFrame() {
   ctx.p_primitive = p_next_buffer->primitivesBuffer;
   // Clear ordering table
   ClearOTagR(p_next_buffer->orderingTable, OT_SIZE);
+}
+
+void gfx_drawRect(int x, int y, int w, int h, RGB rgb) {
+  uint32_t* p_orderTable = ctx.buffers[ctx.bufferID].orderingTable;
+  
+  // Chomp from primitive buffer
+  TILE* p_tile = (TILE*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(TILE);
+
+  setTile(p_tile); // macro required to initialise tile
+  setXY0 (p_tile, x, y);
+  setWH  (p_tile, w, h);
+  setRGB0(p_tile, rgb.r, rgb.g, rgb.b);
+
+  addPrim(p_orderTable, p_tile);
 }

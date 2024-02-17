@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "./gfx/gfx.h"
+#include "./gfx/ui.h"
 #include "defs.h"
 
 int main(int argc, char** argv) {
@@ -25,6 +26,8 @@ int main(int argc, char** argv) {
     gfx_showFontTexture(&tim);
 
     gfx_drawFontString(FONT_GLYPH_SIZE, 160, "PSX LIVES 2024 $", 0);
+
+    ui_renderPlayArea();
 
     framecount++;
     framecount = framecount % 60;

@@ -8,6 +8,10 @@
 #define SCREEN_H 240
 #define FONT_ROW_LENGTH 16
 #define FONT_GLYPH_SIZE 16
+#define BLOCK_SIZE 8
+#define WIDTH 10
+#define HEIGHT 26
+#define SIZE_PADDING 32
 
 /* The RenderBuffer contains multiple buffers associated with graphics:
  * - The display and draw environments
@@ -35,3 +39,9 @@ typedef struct {
   int16_t x;
   int16_t y;
 } Vector2;
+
+typedef struct {
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
+} RGB;
