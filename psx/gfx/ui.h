@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 void ui_renderPlayArea();
 
-// void ui_playTitle(int alive);
+void ui_renderTitle(bool isAlive);

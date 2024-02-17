@@ -16,6 +16,6 @@ void gfx_loadFontTexture();
 void gfx_showFontTexture();
 
 /* Renders text */
-void gfx_drawFontString(int x, int y, char* string, int zIndex);
+void gfx_drawFontString(int x, int y, const char* string, int zIndex);
 
 void gfx_drawRect(int x, int y, int w, int h, RGB rgb);

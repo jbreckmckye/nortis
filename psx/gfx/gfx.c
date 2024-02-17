@@ -118,7 +118,7 @@ void gfx_loadFontTexture() {
   loadTexture(tim_font, &g_font);
 }
 
-void gfx_drawFontString(int x, int y, char* string, int zIndex) {
+void gfx_drawFontString(int x, int y, const char* string, int zIndex) {
   int i = 0;
   char next = string[i];
   while (next) {

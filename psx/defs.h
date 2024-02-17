@@ -11,7 +11,7 @@
 #define BLOCK_SIZE 8
 #define WIDTH 10
 #define HEIGHT 26
-#define SIZE_PADDING 32
+#define SIZE_PADDING 16
 
 /* The RenderBuffer contains multiple buffers associated with graphics:
  * - The display and draw environments
