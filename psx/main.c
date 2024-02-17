@@ -26,10 +26,12 @@ int main(int argc, char** argv) {
   while (1) {
     //gfx_showFontTexture(&tim);
 
-    gfx_drawFontString(16, 240 - FONT_GLYPH_SIZE - 12, "JIMMYB+PSNOOBSDK $", 0);
+    gfx_drawFontString(16, 240 - FONT_GLYPH_SIZE - 12, "PSX LIVES 2024 $", 0);
 
     ui_renderPlayArea();
     ui_renderTitle(true);
+    ui_renderScores(1234, 4321);
+    ui_renderControls(true);
 
     framecount++;
     framecount = framecount % 60;
