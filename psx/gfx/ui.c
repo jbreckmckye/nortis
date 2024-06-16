@@ -7,6 +7,9 @@
 #define TITLE_X 120
 #define MAX_SCORE 100000
 
+// Special characters in font:
+// $ = happy emoji, % = sad emoji, () = left/right arrow, & = up arrow, ' = down arrow
+
 static const char* MSG_PLAYNOTRIS = "PLAY NOTRIS!";
 static const char* MSG_GAMEOVER   = "GAME OVER!!!";
 

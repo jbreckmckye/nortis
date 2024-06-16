@@ -184,7 +184,7 @@ int main(int argc, const char **argv) {
         }
         if (buttons & PAD_DOWN || buttons & PAD_CROSS) {
           playerY += 2;
-          if (playerY + width > 240) playerY = 240;
+          if (playerY + width > 240) playerY = 240 - width;
         }
         if (buttons & PAD_LEFT || buttons & PAD_SQUARE) {
           playerX -= 2;
@@ -192,7 +192,7 @@ int main(int argc, const char **argv) {
         }
         if (buttons & PAD_RIGHT || buttons & PAD_CIRCLE) {
           playerX += 2;
-          if (playerX + width > 320) playerX = 320;
+          if (playerX + width > 320) playerX = 320 - width;
         }
       } else {
         printf("Joypad 1 not connected or not digital pad mode\n");

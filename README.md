@@ -161,6 +161,12 @@ Why, it's `.ps1`, of course!
 
 There's a `build.ps1` file added to the project that can be executed by right clicking in Explorer
 
+### Programming model
+
+The PSX BIOS and SDKs support heap allocations via `malloc` but are buggy and almost never used.
+
+(add note on vsync)
+
 ### Drawing
 
 Setup and text http://lameguy64.net/tutorials/pstutorials/chapter1/1-display.html
@@ -171,12 +177,14 @@ the CPU sends "packets" to the GPU to actually go and render / rasterise primiti
 
 Packets are arranged in RAM using an ordering table. This initialises to a simple linked list of n pointers. Primitives are added by inserting structs into the linked list
 
+See https://psx.arthus.net/sdk/Psy-Q/DOCS/TECHNOTE/ordtbl.pdf
+
 ```
 IN ARRAY:
 
-[Front of screen] --> 0 --> 1 --> 2 --> [Back of screen]
+[Front of screen], z= 0, z=1, z=2, ... [Back of screen]
 
-LINKED:
+LINKED LIST:
 
 0 --                -- 1 <--                                -- 2 <-- BEGINS FROM END 
     \- [Shape 1] <-/         \- [Shape 2] <-- [Shape 3] <--/
@@ -186,15 +194,19 @@ The ordering table is a reverse linked list. In memory it starts with the packet
 index in the list is analogous to a z-index. However it is processed back-to-front to implement the "painter's algorithm". When the ordering table is ready it is processed
 with `DrawOTag()` passing the _last_ element.
 
-Because primitives need to live longer than the functions that declare them, they need to be initialised in a global buffer instead of the stack. (Otherwise functions returning / entering would overwrite the stack memory). The PSX BIOS and SDKs support heap allocations via `malloc` but are buggy and almost never used.
+Because primitives need to live longer than the functions that declare them, they need to be initialised in a global buffer instead of the stack. (Otherwise functions 
+returning / entering would overwrite the stack memory).
 
-Each primitive can be between 3 to 13 words (each word is 4 bytes as the PSX is 32 bit). Generally the primitive buffers can just be declared as arrays of `char` and then the programmer uses `sizeof` and pointer arithmetic to work with the memory. The SDK I'm using provides several macros to help with setting up primitives.
+Each primitive can be between 3 to 13 words (each word is 4 bytes as the PSX is 32 bit). Generally the primitive buffers can just be declared as arrays of `char` and
+then the programmer uses `sizeof` and pointer arithmetic to work with the memory. The SDK I'm using provides several macros to help with setting up primitives.
 
-Generally two ordering tables and primitive buffers are kept in memory, for the same reason two graphics buffers support performance. One set primitives / linked list can be drawn whilst the other is being prepared for the next frame.
+Generally two ordering tables and primitive buffers are kept in memory, for the same reason two graphics buffers support performance. One set primitives / linked list 
+can be drawn whilst the other is being prepared for the next frame.
 
 ### Displaying text
 
-There is a basic debug text utility embedded in the SDK, but it looks very rough and basic. Instead I opted to create a TIM format texture from some PNG pixel art. I wasn't completely happy with how this looked, but I didn't want to focus all my energy on just displaying text.
+There is a simple debug text font, but it looks very rough and basic. Instead I opted to create a TIM format texture from some PNG pixel art. I wasn't completely happy 
+with how this looked, but I didn't want to focus all my energy on just displaying text.
 
 You can see the debug and TIM fonts in the image below:
 
@@ -206,9 +218,9 @@ todo - polygonal graphics, gourad shading
 
 ### Controller input
 
-PSOne controllers are somewhat complex. There are many types (lightguns, mice, analog, digital, multitaps) and a mixture of APIs for accessing them. For most purposes it's fine to use PSNoobSDK's `StartPAD` and `InitPAD`
-functions. These will poll the controllers every frame (vsync) and copy state into a buffer you provide. The actual button data is provided as a map of 16 bits, though curiously the bits are all inverted
-(i.e. they're 1 when unpressed)
+PSOne controllers are somewhat complex. There are many types (lightguns, mice, analog, digital, multitaps) and a mixture of APIs for accessing them. For most purposes it's 
+fine to use PSNoobSDK's `StartPAD` and `InitPAD` functions. These will poll the controllers every frame (vsync) and copy state into a buffer you provide. The actual button 
+data is provided as a map of 16 bits, though curiously the bits are all inverted (i.e. they're 1 when unpressed)
 
 ```c
 // 2x ports, 34 bytes for each (each port may have a 4 controller multitap)

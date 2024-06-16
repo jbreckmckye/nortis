@@ -6,16 +6,6 @@
 
 static RenderContext ctx = {0};
 
-// Special characters in font:
-// $ = happy emoji, % = sad emoji, () = left/right arrow, & = up arrow, ' = down arrow
-static const char* TITLE = "PLAY NOTRIS $";
-static const char* GAMEOVER = "GAME OVER %";
-static const char* CONTROL_MOVE = "() MOVE, & ROTATE";
-static const char* CONTROL_DROP = "' FAST DROP";
-static const char* SCORE = "SCORE";
-static const char* RESTART = "[START] TO RESTART";
-static const char* KREDITS = "2024 JBRECKMCKYE + PSNOOBSDK ^_^";
-
 extern const uint32_t tim_font[];
 extern const size_t tim_font_size;
 
