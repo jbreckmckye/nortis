@@ -1,7 +1,7 @@
 <tim_project>
     <properties buffer_res="0" buffer_order="0"/>
     <tim_group name="global">
-        <tim file="font.tim" source="font.png">
+        <tim file="font.tim" source="font8.png">
             <import_parameters>
                 <target_bpp>4</target_bpp>
                 <dithering>0</dithering>
