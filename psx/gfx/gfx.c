@@ -90,8 +90,8 @@ void gfx_init() {
   SetDefDrawEnv(p_drawEnv1, 0, 0, SCREEN_W, SCREEN_H);
 
   // Autoclear every frame
-  setRGB0(p_drawEnv0, 0x05, 0x07, 0x33);
-  setRGB0(p_drawEnv1, 0x05, 0x07, 0x33);
+  setRGB0(p_drawEnv0, 0x02, 0x02, 0x02);
+  setRGB0(p_drawEnv1, 0x02, 0x02, 0x02);
   p_drawEnv0->isbg = 1;
   p_drawEnv1->isbg = 1;
 
@@ -206,4 +206,62 @@ void gfx_drawRect(int x, int y, int w, int h, RGB rgb) {
   setRGB0(p_tile, rgb.r, rgb.g, rgb.b);
 
   addPrim(p_orderTable, p_tile);
+}
+
+void gfx_drawFrame(int x, int y, int w, int h, RGB rgbStart, RGB rgbMid, RGB rgbEnd) {
+  /**
+   * Create primitives
+   * lineTop, lineRight, lineBtm, lineLeft
+   */
+
+  LINE_G2* p_lineTop = (LINE_G2*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(LINE_G2);
+  setLineG2(p_lineTop);
+
+  LINE_G2* p_lineRight = (LINE_G2*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(LINE_G2);
+  setLineG2(p_lineRight);
+
+  LINE_G2* p_lineBtm = (LINE_G2*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(LINE_G2);
+  setLineG2(p_lineBtm);
+
+  LINE_G2* p_lineLeft = (LINE_G2*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(LINE_G2);
+  setLineG2(p_lineLeft);
+
+  /*
+   * Insert into ordering table 
+   */
+  uint32_t* p_orderTable = ctx.buffers[ctx.bufferID].orderingTable;
+  addPrim(p_orderTable, p_lineTop);
+  addPrim(p_orderTable, p_lineRight);
+  addPrim(p_orderTable, p_lineBtm);
+  addPrim(p_orderTable, p_lineLeft);
+
+  /*
+   * Configure line primitives
+   */
+
+  int x0 = x;
+  int x1 = x + w;
+  int y0 = y;
+  int y1 = y + h;
+
+  setXY2(p_lineTop, x0, y0, x1, y0);
+  setXY2(p_lineRight, x1, y0, x1, y1);
+  setXY2(p_lineBtm, x1, y1, x0, y1);
+  setXY2(p_lineLeft, x0, y1, x0, y0);
+
+  setRGB0(p_lineTop, rgbStart.r, rgbStart.g, rgbStart.b);
+  setRGB1(p_lineTop, rgbMid.r, rgbMid.g, rgbMid.b);
+
+  setRGB0(p_lineRight, rgbMid.r, rgbMid.g, rgbMid.b);
+  setRGB1(p_lineRight, rgbEnd.r, rgbEnd.g, rgbEnd.b);
+
+  setRGB0(p_lineBtm, rgbEnd.r, rgbEnd.g, rgbEnd.b);
+  setRGB1(p_lineBtm, rgbMid.r, rgbMid.g, rgbMid.b);
+
+  setRGB0(p_lineLeft, rgbMid.r, rgbMid.g, rgbMid.b);
+  setRGB1(p_lineLeft, rgbStart.r, rgbStart.g, rgbStart.b);
 }

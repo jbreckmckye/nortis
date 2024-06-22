@@ -6,7 +6,7 @@
 
 #define TITLE_X 120
 #define MAX_SCORE 100000
-#define Y_POS(N) SIZE_PADDING + (N * FONT_GLYPH_SIZE)
+#define Y_POS(N) SIZE_PADDING + (N * FONT_GLYPH_SIZE) + (2 * N)
 
 // Special characters in font:
 // $ = happy emoji, % = sad emoji, () = left/right arrow, & = up arrow, ' = down arrow, * = circle, :;<=> = notronimos
@@ -30,13 +30,21 @@ static const char* MSG_KREDITS    = "BUILT 2024 WITH";
 static const char* MSG_PSNOOB     = "PSNOOBSDK $";
 
 void ui_renderPlayArea() {
-  RGB rgb = {0x0, 0x0, 0x0};
-  gfx_drawRect(
+  RGB startRed = {0xF5, 0x1B, 0x1B};
+  RGB midTurq = {0x1B, 0xF5, 0xA9};
+  RGB endPurp = {0x2D, 0x1B, 0xF5};
+
+  // Draw the play area frame
+  // - Removes two rows from the top, these will be invisible (used for handling rotations at top of area)
+  // - Frame lines are outside the pieces, not beneath them
+  gfx_drawFrame(
     SIZE_PADDING,
     SIZE_PADDING,
-    WIDTH * BLOCK_SIZE,
-    (HEIGHT - 2) * BLOCK_SIZE,
-    rgb
+    2 + (WIDTH * BLOCK_SIZE),
+    2 + ((HEIGHT - 2) * BLOCK_SIZE),
+    startRed,
+    midTurq,
+    endPurp
   );
 }
 
@@ -95,8 +103,8 @@ void ui_renderScores(int score, int lines) {
 }
 
 void ui_renderKredits() {
-  int y1 = Y_POS(20);
-  int y2 = Y_POS(21);
+  int y1 = Y_POS(16);
+  int y2 = Y_POS(17);
 
   gfx_drawFontString(TITLE_X, y1, MSG_KREDITS, 0);
   gfx_drawFontString(TITLE_X, y2, MSG_PSNOOB, 0);

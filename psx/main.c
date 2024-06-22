@@ -16,9 +16,9 @@ int main(int argc, char** argv) {
   gfx_init();
 
   // Code for displaying debug font
-  FntLoad(960, 0);
-  int printStream = FntOpen(10, 10, 300, 220, 0, 80);
-  int framecount = 0;
+  // FntLoad(960, 0);
+  // int printStream = FntOpen(10, 10, 300, 220, 0, 80);
+  // int framecount = 0;
 
   TIM_IMAGE tim;
   gfx_loadFontTexture(&tim);
@@ -32,11 +32,11 @@ int main(int argc, char** argv) {
     ui_renderControls(true);
     ui_renderKredits();
 
-    framecount++;
-    framecount = framecount % 60;
-    // Write into debug text printstream & flush into drawing environment
-    FntPrint(printStream, "FRAME %d", framecount);
-    FntFlush(printStream);
+    // framecount++;
+    // framecount = framecount % 60;
+    // // Write into debug text printstream & flush into drawing environment
+    // FntPrint(printStream, "FRAME %d", framecount);
+    // FntFlush(printStream);
 
     gfx_endFrame();
   }

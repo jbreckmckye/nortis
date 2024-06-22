@@ -18,4 +18,7 @@ void gfx_showFontTexture();
 /* Renders text */
 void gfx_drawFontString(int x, int y, const char* string, int zIndex);
 
+/* Creates a frame with a colour gradient effect topleft->midpoints->bottomright */
+void gfx_drawFrame(int x, int y, int w, int h, RGB rgbStart, RGB rgbMid, RGB rgbEnd);
+
 void gfx_drawRect(int x, int y, int w, int h, RGB rgb);
