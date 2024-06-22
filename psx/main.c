@@ -10,21 +10,18 @@
 
 #include "./gfx/gfx.h"
 #include "./gfx/ui.h"
+#include "./io/pad.h"
 #include "defs.h"
 
 int main(int argc, char** argv) {
   gfx_init();
-
-  // Code for displaying debug font
-  // FntLoad(960, 0);
-  // int printStream = FntOpen(10, 10, 300, 220, 0, 80);
-  // int framecount = 0;
+  pad_init();
 
   TIM_IMAGE tim;
   gfx_loadFontTexture(&tim);
 
   while (1) {
-    //gfx_showFontTexture(&tim);
+    pad_debug();
 
     ui_renderPlayArea();
     ui_renderTitle(true);
@@ -32,12 +29,7 @@ int main(int argc, char** argv) {
     ui_renderControls(true);
     ui_renderKredits();
 
-    // framecount++;
-    // framecount = framecount % 60;
-    // // Write into debug text printstream & flush into drawing environment
-    // FntPrint(printStream, "FRAME %d", framecount);
-    // FntFlush(printStream);
-
+    // Performs vsync & frameswitch
     gfx_endFrame();
   }
 
