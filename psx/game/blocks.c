@@ -35,7 +35,8 @@
  *
  */
 
-static ShapeBits shapeHexes[7][4] = {
+static ShapeBits shapeHexes[8][4] = {
+  { 0 },                              // NONE
   { 0x0F00, 0x4444, 0x0F00, 0x4444 }, // I
   { 0xE200, 0x44C0, 0x8E00, 0xC880 }, // J
   { 0xE800, 0xC440, 0x2E00, 0x88C0 }, // L
@@ -55,7 +56,7 @@ RotationN blocks_getNextRotation(RotationN r) {
 }
 
 ShapeBits blocks_getBlockShape(BlockNames block, RotationN r) {
-  assert(block >= 0 && block < 7);
+  assert(block >= 0 && block < 8);
   assert(r >= 0 && r < 4);
 
   return shapeHexes[block][r];
@@ -75,5 +76,5 @@ static int random() {
 
 BlockNames blocks_randomBlock() {
   // Not truly random (has skew) but probably fine for a game
-  return (random() % 6) + 1;
+  return (random() % 7) + 1;
 }
