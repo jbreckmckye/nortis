@@ -154,7 +154,7 @@ void ui_render(GameState* p_gameState) {
 
   ui_renderPlayArea();
   ui_renderTitle(isAlive);
-  ui_renderScores(score, 4321);
+  ui_renderScores(score, score * 12);
   ui_renderControls(isAlive);
   ui_renderKredits();
 }
