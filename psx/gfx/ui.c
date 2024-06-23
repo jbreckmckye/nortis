@@ -30,21 +30,27 @@ static const char* MSG_KREDITS    = "BUILT 2024 WITH";
 static const char* MSG_PSNOOB     = "PSNOOBSDK $";
 
 void ui_renderPlayArea() {
-  RGB startRed = {0xF5, 0x1B, 0x1B};
-  RGB midTurq = {0x1B, 0xF5, 0xA9};
-  RGB endPurp = {0x2D, 0x1B, 0xF5};
+  RGB squareRed = {0xF5, 0x1B, 0x1B};
+  RGB circleOrange = {0xF5, 0xB0, 0x1B};
+  RGB triangeGreen = {0x1B, 0xF5, 0x26};
+  RGB crossBlue = {0x1B, 0x22, 0xF5};
+
+  XYWH coords = {
+    .x = SIZE_PADDING - 1,
+    .y = SIZE_PADDING - 1,
+    .w = 1 + (WIDTH * BLOCK_SIZE),
+    .h = 1 + ((HEIGHT - 2) * BLOCK_SIZE)
+  };
 
   // Draw the play area frame
   // - Removes two rows from the top, these will be invisible (used for handling rotations at top of area)
   // - Frame lines are outside the pieces, not beneath them
-  gfx_drawFrame(
-    SIZE_PADDING,
-    SIZE_PADDING,
-    2 + (WIDTH * BLOCK_SIZE),
-    2 + ((HEIGHT - 2) * BLOCK_SIZE),
-    startRed,
-    midTurq,
-    endPurp
+  gfx_drawCornerColouredBox(
+    coords,
+    squareRed,
+    circleOrange,
+    triangeGreen,
+    crossBlue
   );
 }
 
@@ -108,4 +114,22 @@ void ui_renderKredits() {
 
   gfx_drawFontString(TITLE_X, y1, MSG_KREDITS, 0);
   gfx_drawFontString(TITLE_X, y2, MSG_PSNOOB, 0);
+}
+
+void ui_renderBlock(int u, int v) {
+  int y = SIZE_PADDING + ((v - 2) * BLOCK_SIZE);
+  int x = SIZE_PADDING + (u * BLOCK_SIZE);
+
+  XYWH coords = {
+    .x = SIZE_PADDING + (u * BLOCK_SIZE),
+    .y = SIZE_PADDING + ((v - 2) * BLOCK_SIZE),
+    .w = BLOCK_SIZE,
+    .h = BLOCK_SIZE,
+  };
+
+  RGB accentLight = { 0x00, 0x6E, 0x89 };
+  RGB fill = { 0x00, 0x48, 0x89 };
+  RGB accentDark = { 0x00, 0x1B, 0x89 };
+
+  gfx_drawBlock(coords, fill, accentLight, accentDark);
 }

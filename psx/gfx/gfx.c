@@ -193,22 +193,46 @@ void gfx_endFrame() {
   ClearOTagR(p_next_buffer->orderingTable, OT_SIZE);
 }
 
-void gfx_drawRect(int x, int y, int w, int h, RGB rgb) {
-  uint32_t* p_orderTable = ctx.buffers[ctx.bufferID].orderingTable;
-  
-  // Chomp from primitive buffer
+void gfx_drawBlock(XYWH coords, RGB fill, RGB accentLight, RGB accentDark) {
+  uint32_t* p_orderingTable = ctx.buffers[ctx.bufferID].orderingTable;
+
+  // A block has two triangles for the light / dark accents, then a tile in the middle
+
+  Vector2 northWest = { coords.x, coords.y };
+  Vector2 northEast = { coords.x + coords.w, coords.y };
+  Vector2 southEast = { coords.x + coords.w, coords.y + coords.h };
+  Vector2 southWest = { coords.x, coords.y + coords.h };
+
+  // Accent top-left
+  POLY_F3* p_upperLeft = (POLY_F3*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(POLY_F3);
+  setPolyF3(p_upperLeft);
+  setXY3(p_upperLeft, northEast.x, northEast.y, northWest.x, northWest.y, southWest.x, southWest.y);
+  setRGB0(p_upperLeft, accentLight.r, accentLight.g, accentLight.b);
+
+  // Accent bottom-right
+  POLY_F3* p_bottomRight = (POLY_F3*)ctx.p_primitive;
+  ctx.p_primitive += sizeof(POLY_F3);
+  setPolyF3(p_bottomRight);
+  setXY3(p_bottomRight, northEast.x, northEast.y, northWest.x, northWest.y, southWest.x, southWest.y);
+  setRGB0(p_bottomRight, accentLight.r, accentLight.g, accentLight.b);
+
+  // Tile
   TILE* p_tile = (TILE*)ctx.p_primitive;
   ctx.p_primitive += sizeof(TILE);
+  setTile(p_tile);
+  setXY0(p_tile, coords.x + 1, coords.y + 1);
+  setWH(p_tile, coords.w - 2, coords.h - 2);
+  setRGB0(p_tile, fill.r, fill.g, fill.b);
 
-  setTile(p_tile); // macro required to initialise tile
-  setXY0 (p_tile, x, y);
-  setWH  (p_tile, w, h);
-  setRGB0(p_tile, rgb.r, rgb.g, rgb.b);
-
-  addPrim(p_orderTable, p_tile);
+  // Add primitives to ordering table
+  // Triangles at back
+  addPrim(p_orderingTable, p_tile);
+  addPrim(p_orderingTable + 1, p_upperLeft);
+  addPrim(p_orderingTable + 1, p_bottomRight);
 }
 
-void gfx_drawFrame(int x, int y, int w, int h, RGB rgbStart, RGB rgbMid, RGB rgbEnd) {
+void gfx_drawCornerColouredBox(XYWH coords, RGB rgbNW, RGB rgbNE, RGB rgbSE, RGB rgbSW) {
   /**
    * Create primitives
    * lineTop, lineRight, lineBtm, lineLeft
@@ -243,25 +267,25 @@ void gfx_drawFrame(int x, int y, int w, int h, RGB rgbStart, RGB rgbMid, RGB rgb
    * Configure line primitives
    */
 
-  int x0 = x;
-  int x1 = x + w;
-  int y0 = y;
-  int y1 = y + h;
+  int x0 = coords.x;
+  int x1 = coords.x + coords.w;
+  int y0 = coords.y;
+  int y1 = coords.y + coords.h;
 
   setXY2(p_lineTop, x0, y0, x1, y0);
   setXY2(p_lineRight, x1, y0, x1, y1);
   setXY2(p_lineBtm, x1, y1, x0, y1);
   setXY2(p_lineLeft, x0, y1, x0, y0);
 
-  setRGB0(p_lineTop, rgbStart.r, rgbStart.g, rgbStart.b);
-  setRGB1(p_lineTop, rgbMid.r, rgbMid.g, rgbMid.b);
+  setRGB0(p_lineTop, rgbNW.r, rgbNW.g, rgbNW.b);
+  setRGB1(p_lineTop, rgbNE.r, rgbNE.g, rgbNE.b);
 
-  setRGB0(p_lineRight, rgbMid.r, rgbMid.g, rgbMid.b);
-  setRGB1(p_lineRight, rgbEnd.r, rgbEnd.g, rgbEnd.b);
+  setRGB0(p_lineRight, rgbNE.r, rgbNE.g, rgbNE.b);
+  setRGB1(p_lineRight, rgbSE.r, rgbSE.g, rgbSE.b);
 
-  setRGB0(p_lineBtm, rgbEnd.r, rgbEnd.g, rgbEnd.b);
-  setRGB1(p_lineBtm, rgbMid.r, rgbMid.g, rgbMid.b);
+  setRGB0(p_lineBtm, rgbSE.r, rgbSE.g, rgbSE.b);
+  setRGB1(p_lineBtm, rgbSW.r, rgbSW.g, rgbSW.b);
 
-  setRGB0(p_lineLeft, rgbMid.r, rgbMid.g, rgbMid.b);
-  setRGB1(p_lineLeft, rgbStart.r, rgbStart.g, rgbStart.b);
+  setRGB0(p_lineLeft, rgbSW.r, rgbSW.g, rgbSW.b);
+  setRGB1(p_lineLeft, rgbNW.r, rgbNW.g, rgbNW.b);
 }

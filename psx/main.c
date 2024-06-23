@@ -35,11 +35,19 @@ int main(int argc, char** argv) {
       printf("RANDOM NUMBER %d \n", random());
     }
 
+    // These could all be combined into a render frame fn
     ui_renderPlayArea();
     ui_renderTitle(true);
     ui_renderScores(5678, 9012);
     ui_renderControls(true);
     ui_renderKredits();
+
+    ui_renderBlock(0, 2);
+    ui_renderBlock(3, 3);
+    ui_renderBlock(2, 4);
+    ui_renderBlock(3, 4);
+    ui_renderBlock(4, 4);
+    ui_renderBlock(9, 25);
 
     // Performs vsync & frameswitch
     gfx_endFrame();
