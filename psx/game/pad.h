@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include "../defs.h"
+
 /**
  * PAD.H
  * ############################################################################
@@ -8,4 +10,4 @@
 
 void pad_debug();
 void pad_init();
-uint16_t pad_buttons1();
+GameInputs pad_getInput();

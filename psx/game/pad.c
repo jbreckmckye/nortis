@@ -2,6 +2,7 @@
 #include <psxapi.h>
 #include <psxpad.h>
 
+#include "../defs.h"
 #include "pad.h"
 
 /**
@@ -24,7 +25,7 @@ void pad_init() {
 // Returns a 16 bit number mask of button states
 // Normally input values are inverted (1=unpressed), this inverts so we 
 // can do bitwise ops with PAD_UP etc
-uint16_t pad_buttons1() {
+static uint16_t pad_buttons1() {
   PADTYPE* pad = (PADTYPE*)pads[0];
 
   // Exit if: not connected
@@ -34,6 +35,18 @@ uint16_t pad_buttons1() {
   if (pad->type != PAD_ID_DIGITAL) return 0;
 
   return ~ pad->btn;
+}
+
+GameInputs pad_getInput() {
+  uint16_t btn = pad_buttons1();
+
+  if (btn & PAD_LEFT) return INPUT_LEFT;
+  if (btn & PAD_RIGHT) return INPUT_RIGHT;
+  if (btn & PAD_CROSS) return INPUT_DROP;
+  if (btn & PAD_CIRCLE) return INPUT_ROTATE;
+  if (btn & PAD_START) return INPUT_RESTART;
+
+  return INPUT_NONE;
 }
 
 // printf selected buttons e.g "up, x, L1 pressed"
@@ -54,4 +67,7 @@ void pad_debug() {
   if (btn & PAD_SELECT) printf("sel, ");
   if (btn & PAD_START) printf("start, ");
   if (btn) printf("pressed\n");
+
+  GameInputs parsed = pad_getInput();
+  printf("Parsed input val = %d\n", parsed);
 }

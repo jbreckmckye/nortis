@@ -12,6 +12,7 @@
 #define BLOCK_SIZE 8
 #define WIDTH 10
 #define HEIGHT 26
+#define HIDDEN_ROWS 2
 #define SIZE_PADDING 20
 #define GRID_BIT_OFFSET 0x8000
 
@@ -74,3 +75,51 @@ typedef enum BlockNames {
 
 typedef int16_t ShapeBits;
 typedef int RotationN;
+
+// typedef enum PlayStates {
+//   PLAY_PLAYING,
+//   PLAY_GAMEOVER
+// } PlayStates;
+
+typedef enum {
+  INPUT_NONE = 0,
+  INPUT_LEFT,
+  INPUT_RIGHT,
+  INPUT_ROTATE,
+  INPUT_DROP,
+  INPUT_RESTART,
+} GameInputs;
+
+// typedef enum GameMovements {
+//   MOVE_LEFT = -1,
+//   MOVE_RIGHT = 1,
+// } GameMovements;
+
+// typedef enum GameCollisions {
+//   COLLIDE_NONE = 0,
+//   COLLIDE_LEFTWALL,
+//   COLLIDE_RIGHTWALL,
+//   COLLIDE_BOTTOMWALL,
+//   COLLIDE_CELL
+// } GameCollisions;
+
+// typedef BlockNames Field[HEIGHT][WIDTH];
+// typedef BlockNames DrawField[HEIGHT - HIDDEN_ROWS][WIDTH];
+
+// struct GameState {
+//   BlockNames blockName;
+//   int blockRotation;
+//   int clearedLines;
+//   int points;
+//   int positionX;
+//   int positionY;
+//   PlayStates playState;
+// } typedef GameState;
+
+// typedef enum BorderFlags {
+//   BORDER_TOP = 1,
+//   BORDER_LEFT = 2,
+//   BORDER_BOTTOM = 4,
+//   BORDER_RIGHT = 8,
+//   BORDER_ALL = 15
+// } BorderFlags;
