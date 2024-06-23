@@ -3,6 +3,12 @@
 #include <psxgpu.h>
 #include "../defs.h"
 
+/**
+ * GFX.H
+ * ############################################################################
+ * Functions for graphics primitives, drawing shapes & text
+ */
+
 /* Initialise PSX graphics systems; set up global memory buffers for graphics primitives */
 void gfx_init();
 

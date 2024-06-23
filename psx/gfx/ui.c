@@ -4,6 +4,12 @@
 #include "ui.h"
 #include "../defs.h"
 
+/**
+ * UI.C
+ * ############################################################################
+ * High level functions for drawing the play state
+ */
+
 #define TITLE_X 120
 #define MAX_SCORE 100000
 #define Y_POS(N) SIZE_PADDING + (N * FONT_GLYPH_SIZE) + (2 * N)

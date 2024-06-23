@@ -4,6 +4,12 @@
 #include "../defs.h"
 #include "gfx.h"
 
+/**
+ * GFX.C
+ * ############################################################################
+ * Functions for graphics primitives, drawing shapes & text
+ */
+
 static RenderContext ctx = {0};
 
 extern const uint32_t tim_font[];

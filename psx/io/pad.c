@@ -4,6 +4,12 @@
 
 #include "pad.h"
 
+/**
+ * PAD.C
+ * ############################################################################
+ * Helpers for polling joypad state
+ */
+
 // Control input buffer - 2 controllers with 34 bytes each
 uint8_t pads[2][34];
 
