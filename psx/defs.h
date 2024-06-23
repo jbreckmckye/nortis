@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <psxgpu.h>
 
 #define OT_SIZE 16
@@ -12,6 +13,7 @@
 #define WIDTH 10
 #define HEIGHT 26
 #define SIZE_PADDING 20
+#define GRID_BIT_OFFSET 0x8000
 
 /* The RenderBuffer contains multiple buffers associated with graphics:
  * - The display and draw environments
@@ -69,3 +71,6 @@ typedef enum BlockNames {
   BLOCK_T,
   BLOCK_Z
 } BlockNames;
+
+typedef int16_t ShapeBits;
+typedef int RotationN;
