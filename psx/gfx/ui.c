@@ -36,7 +36,12 @@ static const char* MSG_RESTART    = "PRESS START";
 static const char* MSG_KREDITS    = "BUILT 2024 WITH";
 static const char* MSG_PSNOOB     = "PSNOOBSDK $";
 
-void ui_renderPlayArea() {
+/**
+ * Private functions
+ * ============================================================================
+ */
+
+static void ui_renderPlayArea() {
   RGB squareRed = {0xF5, 0x1B, 0x1B};
   RGB circleOrange = {0xF5, 0xB0, 0x1B};
   RGB triangeGreen = {0x1B, 0xF5, 0x26};
@@ -61,7 +66,7 @@ void ui_renderPlayArea() {
   );
 }
 
-void ui_renderTitle(bool isAlive) {
+static void ui_renderTitle(bool isAlive) {
   if (isAlive) {
      gfx_drawFontString(TITLE_X, SIZE_PADDING, MSG_PLAYNOTRIS, 0);
   } else {
@@ -70,7 +75,7 @@ void ui_renderTitle(bool isAlive) {
   gfx_drawFontString(TITLE_X, Y_POS(1), MSG_DIVIDER, 0);
 }
 
-void ui_renderControls(bool isAlive) {
+static void ui_renderControls(bool isAlive) {
   int y1 = Y_POS(8);
   int y2 = Y_POS(9);
   int y3 = Y_POS(10);
@@ -89,7 +94,7 @@ void ui_renderControls(bool isAlive) {
   }
 }
 
-void ui_renderScores(int score, int lines) {
+static void ui_renderScores(int score, int lines) {
   int y1 = Y_POS(3);
   int y2 = Y_POS(4);
   int x2 = TITLE_X + (FONT_GLYPH_SIZE * 6);
@@ -115,13 +120,18 @@ void ui_renderScores(int score, int lines) {
   gfx_drawFontString(x2, y2, linesText, 0);
 }
 
-void ui_renderKredits() {
+static void ui_renderKredits() {
   int y1 = Y_POS(16);
   int y2 = Y_POS(17);
 
   gfx_drawFontString(TITLE_X, y1, MSG_KREDITS, 0);
   gfx_drawFontString(TITLE_X, y2, MSG_PSNOOB, 0);
 }
+
+/**
+ * Public functions
+ * ============================================================================
+ */
 
 void ui_renderBlock(int u, int v) {
   int y = SIZE_PADDING + ((v - 2) * BLOCK_SIZE);
@@ -136,4 +146,15 @@ void ui_renderBlock(int u, int v) {
 
   ColourPalette* p_colours = colours_getBlockColours(BLOCK_T);
   gfx_drawBlock(coords, p_colours->main, p_colours->light, p_colours->dark);
+}
+
+void ui_render(GameState* p_gameState) {
+  bool isAlive = p_gameState->playState == PLAY_PLAYING;
+  int score = p_gameState->clearedLines;
+
+  ui_renderPlayArea();
+  ui_renderTitle(isAlive);
+  ui_renderScores(score, 4321);
+  ui_renderControls(isAlive);
+  ui_renderKredits();
 }

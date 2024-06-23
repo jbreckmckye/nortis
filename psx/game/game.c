@@ -277,8 +277,8 @@ static void mutate_commitPiece() {
  * ============================================================================
  */
 
-const DrawField* const game_p_drawField = &g_drawField;
-const GameState* const game_p_gameState = &g_gameState;
+DrawField* game_p_drawField = &g_drawField;
+GameState* game_p_gameState = &g_gameState;
 
 /**
  * Public functions

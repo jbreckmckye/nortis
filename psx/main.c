@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "game/game.h"
 #include "game/pad.h"
 #include "gfx/gfx.h"
 #include "gfx/ui.h"
@@ -26,12 +27,8 @@ int main(int argc, char** argv) {
   while (1) {
     pad_debug();
 
-    // These could all be combined into a render frame fn
-    ui_renderPlayArea();
-    ui_renderTitle(true);
-    ui_renderScores(5678, 9012);
-    ui_renderControls(true);
-    ui_renderKredits();
+    // todo extract
+    ui_render(game_p_gameState);
 
     ui_renderBlock(3, 3);
     ui_renderBlock(2, 4);

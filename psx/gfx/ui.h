@@ -1,16 +1,14 @@
 #include <stdbool.h>
 
+#include "../defs.h"
+
 /**
  * UI.H
  * ############################################################################
  * High level functions for drawing the play state
  */
 
-void ui_renderPlayArea();
-void ui_renderScores(int score, int lines);
-void ui_renderControls(bool isAlive);
-void ui_renderKredits();
-void ui_renderTitle(bool isAlive);
+void ui_render(GameState* p_gameState);
 
-// These functions will need to be re-orged
+// Temporary
 void ui_renderBlock(int u, int v);

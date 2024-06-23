@@ -10,8 +10,8 @@
  * Exposes DrawField (graphics state) and GameState (game state) readonly ptrs
  */
 
-extern const DrawField* const game_p_drawField;
-extern const GameState* const game_p_gameState;
+extern DrawField* game_p_drawField;
+extern GameState* game_p_gameState;
 
 /**
  * Informs caller how often to call (level speed)
