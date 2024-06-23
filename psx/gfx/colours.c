@@ -1,0 +1,65 @@
+#include "../defs.h"
+
+/**
+ * COLOURS.C
+ * ############################################################################
+ * Colour values & helpers
+ */
+
+RGB colours_bkg = {0x02, 0x02, 0x02};
+
+ColourPalette colours_blue = {
+  {0x00, 0x3D, 0xCD},
+  {0x0B, 0x54, 0xFF},
+  {0x00, 0x2B, 0x90}
+};
+
+ColourPalette colours_green = {
+  {0x00, 0xCD, 0x37},
+  {0x0B, 0xFF, 0x4D},
+  {0x00, 0x90, 0x27},
+};
+
+ColourPalette colours_red = {
+  {0xCD, 0x00, 0x30},
+  {0xFF, 0x0B, 0x45},
+  {0x90, 0x00, 0x22}
+};
+
+ColourPalette colours_orange = {
+  {0xDF, 0x85, 0x00},
+  {0xFF, 0xA6, 0x23},
+  {0x9C, 0x5D, 0x00}
+};
+
+ColourPalette colours_purple = {
+  {0x89, 0x00, 0xCD},
+  {0xAE, 0x0B, 0xFF},
+  {0x60, 0x00, 0x90}
+};
+
+ColourPalette colours_turqoise = {
+  {0x00, 0xCD, 0xC3},
+  {0x0B, 0xFF, 0xF3},
+  {0x00, 0x90, 0x88}
+};
+
+ColourPalette colours_yellow = {
+  {0xD8, 0xD2, 0x00},
+  {0xFF, 0xF9, 0x1A},
+  {0x97, 0x93, 0x00}
+};
+
+ColourPalette* colours_getBlockColours(BlockNames blockKey) {
+  switch (blockKey) {
+    case BLOCK_I: return &colours_orange;
+    case BLOCK_J: return &colours_green;
+    case BLOCK_L: return &colours_purple;
+    case BLOCK_O: return &colours_yellow;
+    case BLOCK_S: return &colours_red;
+    case BLOCK_T: return &colours_blue;
+    case BLOCK_Z:
+    default:
+      return &colours_turqoise;
+  }
+}

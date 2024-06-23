@@ -3,6 +3,7 @@
 
 #include "ui.h"
 #include "../defs.h"
+#include "colours.h"
 
 /**
  * UI.C
@@ -133,9 +134,6 @@ void ui_renderBlock(int u, int v) {
     .h = BLOCK_SIZE,
   };
 
-  RGB accentLight = { 0x00, 0x6E, 0x89 };
-  RGB fill = { 0x00, 0x48, 0x89 };
-  RGB accentDark = { 0x00, 0x1B, 0x89 };
-
-  gfx_drawBlock(coords, fill, accentLight, accentDark);
+  ColourPalette* p_colours = colours_getBlockColours(BLOCK_T);
+  gfx_drawBlock(coords, p_colours->main, p_colours->light, p_colours->dark);
 }

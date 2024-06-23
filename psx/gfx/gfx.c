@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "../defs.h"
+#include "colours.h"
 #include "gfx.h"
 
 /**
@@ -96,8 +97,8 @@ void gfx_init() {
   SetDefDrawEnv(p_drawEnv1, 0, 0, SCREEN_W, SCREEN_H);
 
   // Autoclear every frame
-  setRGB0(p_drawEnv0, 0x02, 0x02, 0x02);
-  setRGB0(p_drawEnv1, 0x02, 0x02, 0x02);
+  setRGB0(p_drawEnv0, colours_bkg.r, colours_bkg.g, colours_bkg.b);
+  setRGB0(p_drawEnv1, colours_bkg.r, colours_bkg.g, colours_bkg.b);
   p_drawEnv0->isbg = 1;
   p_drawEnv1->isbg = 1;
 
