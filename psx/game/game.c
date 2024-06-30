@@ -306,6 +306,7 @@ int32_t game_getSpeed() {
 void game_updateDrawState() {
   for (int y = 0; y < DRAW_HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
+      // Transpose from field, ignoring the topmost two hidden rows
       g_drawField[y][x] = g_field[y + HIDDEN_ROWS][x];
     }
   }

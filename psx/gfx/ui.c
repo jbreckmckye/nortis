@@ -126,12 +126,9 @@ static void renderKredits() {
  */
 
 void ui_renderBlock(int u, int v) {
-  int y = SIZE_PADDING + ((v - 2) * BLOCK_SIZE);
-  int x = SIZE_PADDING + (u * BLOCK_SIZE);
-
   XYWH coords = {
     .x = SIZE_PADDING + (u * BLOCK_SIZE),
-    .y = SIZE_PADDING + ((v - 2) * BLOCK_SIZE),
+    .y = SIZE_PADDING + (v * BLOCK_SIZE),
     .w = BLOCK_SIZE,
     .h = BLOCK_SIZE,
   };

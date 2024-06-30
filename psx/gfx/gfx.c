@@ -78,6 +78,14 @@ static void cmdCharacterSprite(int x, int y, int charCode, int zIndex) {
   addPrim(p_orderTable + zIndex, p_sprite);
 }
 
+/**
+ * Public functions / values
+ * ============================================================================
+ */
+
+/* For debugging */
+RenderContext* gfx_p_ctx = &ctx;
+
 void gfx_init() {
   ResetGraph(0);
 

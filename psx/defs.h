@@ -4,7 +4,7 @@
 #include <psxgpu.h>
 
 #define OT_SIZE 16
-#define PACKETS_SIZE 8192
+#define PACKETS_SIZE 20480
 #define SCREEN_W 320
 #define SCREEN_H 240
 #define FONT_ROW_LENGTH 16
@@ -68,7 +68,7 @@ typedef struct {
 } XYWH;
 
 typedef enum BlockNames {
-  BLOCK_NONE,
+  BLOCK_NONE = 0,
   BLOCK_I,
   BLOCK_J,
   BLOCK_L,
