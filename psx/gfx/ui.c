@@ -14,6 +14,7 @@
 #define TITLE_X 120
 #define MAX_SCORE 100000
 #define Y_POS(N) SIZE_PADDING + (N * FONT_GLYPH_SIZE) + (2 * N)
+#define MAIN_TEXT(Y_INDEX, TXT) gfx_drawFontString(TITLE_X, Y_POS(Y_INDEX), TXT, 0)
 
 // Special characters in font:
 // $ = happy emoji, % = sad emoji, () = left/right arrow, & = up arrow, ' = down arrow, * = circle, :;<=> = notronimos
@@ -41,7 +42,7 @@ static const char* MSG_PSNOOB     = "PSNOOBSDK $";
  * ============================================================================
  */
 
-static void ui_renderPlayArea() {
+static void renderPlayArea() {
   RGB squareRed = {0xF5, 0x1B, 0x1B};
   RGB circleOrange = {0xF5, 0xB0, 0x1B};
   RGB triangeGreen = {0x1B, 0xF5, 0x26};
@@ -66,7 +67,7 @@ static void ui_renderPlayArea() {
   );
 }
 
-static void ui_renderTitle(bool isAlive) {
+static void renderTitle(bool isAlive) {
   if (isAlive) {
      gfx_drawFontString(TITLE_X, SIZE_PADDING, MSG_PLAYNOTRIS, 0);
   } else {
@@ -75,26 +76,20 @@ static void ui_renderTitle(bool isAlive) {
   gfx_drawFontString(TITLE_X, Y_POS(1), MSG_DIVIDER, 0);
 }
 
-static void ui_renderControls(bool isAlive) {
-  int y1 = Y_POS(8);
-  int y2 = Y_POS(9);
-  int y3 = Y_POS(10);
-  int y4 = Y_POS(11);
-  int y5 = Y_POS(12);
-
-  gfx_drawFontString(TITLE_X, y1, MSG_CONTROLS, 0);
-  gfx_drawFontString(TITLE_X, y2, MSG_DIVIDER, 0);
+static void renderControls(bool isAlive) {
+  MAIN_TEXT(8, MSG_CONTROLS);
+  MAIN_TEXT(9, MSG_DIVIDER);
 
   if (isAlive) {
-    gfx_drawFontString(TITLE_X, y3, MSG_CTRL_MOVE, 0);
-    gfx_drawFontString(TITLE_X, y4, MSG_CTRL_ROT, 0);
-    gfx_drawFontString(TITLE_X, y5, MSG_CTRL_DROP, 0);
+    MAIN_TEXT(10, MSG_CTRL_MOVE);
+    MAIN_TEXT(11, MSG_CTRL_ROT);
+    MAIN_TEXT(12, MSG_CTRL_DROP);
   } else {
-    gfx_drawFontString(TITLE_X, y4, MSG_RESTART, 0);
+    MAIN_TEXT(11, MSG_RESTART);
   }
 }
 
-static void ui_renderScores(int score, int lines) {
+static void renderScores(int score, int lines) {
   int y1 = Y_POS(3);
   int y2 = Y_POS(4);
   int x2 = TITLE_X + (FONT_GLYPH_SIZE * 6);
@@ -120,12 +115,9 @@ static void ui_renderScores(int score, int lines) {
   gfx_drawFontString(x2, y2, linesText, 0);
 }
 
-static void ui_renderKredits() {
-  int y1 = Y_POS(16);
-  int y2 = Y_POS(17);
-
-  gfx_drawFontString(TITLE_X, y1, MSG_KREDITS, 0);
-  gfx_drawFontString(TITLE_X, y2, MSG_PSNOOB, 0);
+static void renderKredits() {
+  MAIN_TEXT(16, MSG_KREDITS);
+  MAIN_TEXT(17, MSG_PSNOOB);
 }
 
 /**
@@ -152,9 +144,9 @@ void ui_render(GameState* p_gameState) {
   bool isAlive = p_gameState->playState == PLAY_PLAYING;
   int score = p_gameState->clearedLines;
 
-  ui_renderPlayArea();
-  ui_renderTitle(isAlive);
-  ui_renderScores(score, score * 12);
-  ui_renderControls(isAlive);
-  ui_renderKredits();
+  renderPlayArea();
+  renderTitle(isAlive);
+  renderScores(score, score * 12);
+  renderControls(isAlive);
+  renderKredits();
 }
