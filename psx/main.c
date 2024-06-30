@@ -14,11 +14,7 @@
 #include "gfx/ui.h"
 #include "defs.h"
 
-void listenPlayControls(GameInputs lastFrameInput, GameInputs thisFrameInput) {
-  if (thisFrameInput == lastFrameInput) {
-    return;
-  }
-
+void applyInput(GameInputs thisFrameInput) {
   switch (thisFrameInput) {
     case INPUT_LEFT:
       game_actionMovement(MOVE_LEFT);
@@ -48,30 +44,41 @@ int main(int argc, char** argv) {
   int tickSpeed = game_getSpeed();
 
   // Inputs
-  GameInputs lastFrameInput = INPUT_NONE;
-  GameInputs thisFrameInput = INPUT_NONE;
+  GameInputs lastInput = INPUT_NONE;
+  GameInputs nextInput = INPUT_NONE;
+  int inputHeldForFrames = 0;
 
   while (1) {
     // Implement game 'ticks'
     tickFrames++;
     if (tickFrames >= tickSpeed) {
-      // Gravity on blocks
       game_actionSoftDrop();
-      // Reset movement debounce
-      if (lastFrameInput == INPUT_LEFT || lastFrameInput == INPUT_RIGHT) {
-        lastFrameInput = INPUT_NONE;
-      }
-
       tickFrames = 0;
       tickSpeed = game_getSpeed();
     }
 
-    // Apply controls
-    thisFrameInput = pad_getInput();
-    if (game_p_gameState->playState == PLAY_PLAYING) {
-      listenPlayControls(lastFrameInput, thisFrameInput);
+    // Get input + length it has been held
+    nextInput = pad_getInput();
+    if (nextInput == lastInput) {
+      inputHeldForFrames++;
+    } else {
+      inputHeldForFrames = 0;
     }
-    lastFrameInput = thisFrameInput;
+
+    // Reset the 'hold' every half second for movement inputs
+    if (inputHeldForFrames > 30) {
+      if (nextInput == INPUT_LEFT || nextInput == INPUT_RIGHT) {
+        inputHeldForFrames = 0;
+      }
+    }
+
+    // Apply fresh inputs that haven't been 'held' over frames
+    if (inputHeldForFrames == 0) {
+      applyInput(nextInput);
+    }
+
+    lastInput = nextInput;
+
 
     // Draw UI
     ui_render(game_p_gameState);

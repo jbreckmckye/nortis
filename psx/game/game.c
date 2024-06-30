@@ -302,9 +302,9 @@ void game_actionRestart() {
  * Is the interval between pieces falling, measured in frames
  */
 int32_t game_getSpeed() {
-  int setsCleared = g_gameState.clearedLines / 5;
-  int level = MAX(MIN(1, setsCleared), 10);
-  return 60 - (level * 3);
+  int setsCleared = g_gameState.clearedLines / 4;
+  int level = MAX(MIN(1, setsCleared), 20);
+  return 60 - (level * 2);
 }
 
 /**
