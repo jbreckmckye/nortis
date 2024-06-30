@@ -125,7 +125,7 @@ static void renderKredits() {
  * ============================================================================
  */
 
-void ui_renderBlock(int u, int v) {
+void ui_renderBlock(int u, int v, BlockNames block) {
   XYWH coords = {
     .x = SIZE_PADDING + (u * BLOCK_SIZE),
     .y = SIZE_PADDING + (v * BLOCK_SIZE),
@@ -133,7 +133,7 @@ void ui_renderBlock(int u, int v) {
     .h = BLOCK_SIZE,
   };
 
-  ColourPalette* p_colours = colours_getBlockColours(BLOCK_T);
+  ColourPalette* p_colours = colours_getBlockColours(block);
   gfx_drawBlock(coords, p_colours->main, p_colours->light, p_colours->dark);
 }
 

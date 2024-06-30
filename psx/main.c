@@ -43,19 +43,14 @@ int main(int argc, char** argv) {
     ui_render(game_p_gameState);
 
     // Draw pieces
-    for (int y = 0; y < DRAW_HEIGHT; y++) {
-      for (int x = 0; x < WIDTH; x++) {
-        ui_renderBlock(x, y);
-      }
-    }
+    game_updateDrawState();
 
     for (int y = 0; y < DRAW_HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
         BlockNames block = (*game_p_drawField)[y][x];
-        printf("block x/y %d,%d  val %d \n", x, y, block);
-        // if (block) {
-        //   ui_renderBlock(x, y);
-        // }
+        if (block) {
+          ui_renderBlock(x, y, block);
+        }
       }
     }
 
