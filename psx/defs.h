@@ -86,7 +86,7 @@ typedef enum PlayStates {
   PLAY_GAMEOVER
 } PlayStates;
 
-typedef enum {
+typedef enum GameInputs {
   INPUT_NONE = 0,
   INPUT_LEFT,
   INPUT_RIGHT,
@@ -124,10 +124,3 @@ struct GameState {
   PlayStates playState;
 } typedef GameState;
 
-// typedef enum BorderFlags {
-//   BORDER_TOP = 1,
-//   BORDER_LEFT = 2,
-//   BORDER_BOTTOM = 4,
-//   BORDER_RIGHT = 8,
-//   BORDER_ALL = 15
-// } BorderFlags;

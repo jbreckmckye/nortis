@@ -19,7 +19,14 @@
 
 static Field g_field = { 0 };
 static DrawField g_drawField = { 0 };
-static GameState g_gameState = { 0 };
+static GameState g_gameState = { 
+  .blockName = BLOCK_NONE,
+  .blockRotation = 0,
+  .clearedLines = 0,
+  .points = 0,
+  .positionX = 0,
+  .positionY = 0  
+};
 
 /**
  * Private functions

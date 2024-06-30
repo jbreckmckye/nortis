@@ -40,11 +40,11 @@ static uint16_t pad_buttons1() {
 GameInputs pad_getInput() {
   uint16_t btn = pad_buttons1();
 
+  if (btn & PAD_CIRCLE) return INPUT_ROTATE;
+  if (btn & PAD_CROSS) return INPUT_DROP;
+  if (btn & PAD_START) return INPUT_RESTART;
   if (btn & PAD_LEFT) return INPUT_LEFT;
   if (btn & PAD_RIGHT) return INPUT_RIGHT;
-  if (btn & PAD_CROSS) return INPUT_DROP;
-  if (btn & PAD_CIRCLE) return INPUT_ROTATE;
-  if (btn & PAD_START) return INPUT_RESTART;
 
   return INPUT_NONE;
 }
