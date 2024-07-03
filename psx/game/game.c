@@ -285,7 +285,7 @@ static void mutate_commitPiece() {
  */
 
 DrawField* game_p_drawField = &g_drawField;
-GameState* game_p_gameState = &g_gameState;
+GameState* game_p_state = &g_gameState;
 
 /**
  * Public functions

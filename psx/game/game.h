@@ -11,7 +11,7 @@
  */
 
 extern DrawField* game_p_drawField;
-extern GameState* game_p_gameState;
+extern GameState* game_p_state;
 
 /**
  * Informs caller how often to call (level speed)
