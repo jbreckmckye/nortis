@@ -10,5 +10,6 @@
 
 void ui_render(GameState* p_gameState);
 
-// Temporary
 void ui_renderBlock(int u, int v, BlockNames block);
+
+void ui_renderTitle();

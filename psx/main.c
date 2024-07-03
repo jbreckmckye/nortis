@@ -4,8 +4,10 @@
  * ############################################################################
  */
 
+#include <psxapi.h>
 #include <psxgpu.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
 
@@ -15,20 +17,35 @@
 #include "gfx/ui.h"
 #include "defs.h"
 
-void applyInput(GameInputs thisFrameInput) {
-  switch (thisFrameInput) {
-    case INPUT_LEFT:
-      game_actionMovement(MOVE_LEFT);
-      break;
-    case INPUT_RIGHT:
-      game_actionMovement(MOVE_RIGHT);
-      break;
-    case INPUT_ROTATE:
-      game_actionRotate();
-      break;
-    case INPUT_DROP:
-      game_actionHardDrop();
-      break;
+// Spells out 'notris' when masked & shifted with a 22 bit long mask
+static int32_t titleMask = 0b1000000000000000000000;
+static int32_t titlePattern[5] = {
+  0b1001011101110111010111,
+  0b1101010100100101010100,
+  0b1011010100100110010111,
+  0b1001010100100101010001,
+  0b1001011100100101010111
+};
+
+BlockNames getTitleEffectBlock(int x, int y, int timer) {
+  // Blocks are printed in gradually
+  int ticks = timer / 2;
+  int position = (y * 22) + x;
+  if (position > ticks) {
+    return BLOCK_NONE; // skip if not to be displayed yet
+  }
+
+  int32_t line = titlePattern[y];
+  int32_t mask = titleMask >> x;
+  if (line & mask) {
+    // Gradient effect
+    return
+      x < 4 ? BLOCK_S :
+      x < 8 ? BLOCK_L :
+      x < 12 ? BLOCK_T :
+      x < 16 ? BLOCK_J :
+      x < 19 ? BLOCK_I :
+      BLOCK_O;
   }
 }
 
@@ -38,6 +55,34 @@ int main(int argc, char** argv) {
 
   TIM_IMAGE tim;
   gfx_loadFontTexture(&tim);
+
+  bool started = false;
+  int32_t titleTimer = 0;
+  while (!started) {
+    if (pad_getInput() == INPUT_RESTART) {
+      started = true;
+    }
+
+    titleTimer++;
+    if (titleTimer > 1200) {
+      titleTimer = 600;
+    }
+
+    for (int y = 0; y < 5; y++) {
+      for (int x = 0; x < 22; x++) {
+        BlockNames titleBlock = getTitleEffectBlock(x, y, titleTimer);
+        if (titleBlock) {
+          ui_renderBlock(x + 6, y + 8, titleBlock);
+        }
+      }
+    }
+
+    if (titleTimer > 300 && (titleTimer % 60) < 30) {
+      ui_renderTitle();
+    }
+
+    gfx_endFrame();
+  }
 
   // Set up game state
   game_actionRestart();

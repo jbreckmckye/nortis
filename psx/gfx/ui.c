@@ -34,6 +34,8 @@ static const char* MSG_CTRL_DROP  = "DROP   X";
 
 static const char* MSG_RESTART    = "PRESS START";
 
+static const char* MSG_START      = ":;<=> PRESS START TO BEGIN :;<=>";
+
 static const char* MSG_KREDITS    = "BUILT 2024 WITH";
 static const char* MSG_PSNOOB     = "PSNOOBSDK $";
 
@@ -146,4 +148,8 @@ void ui_render(GameState* p_gameState) {
   renderScores(score, score * 12);
   renderControls(isAlive);
   renderKredits();
+}
+
+void ui_renderTitle(int timer) {
+   gfx_drawFontString(30, 150, MSG_START, 0);
 }
