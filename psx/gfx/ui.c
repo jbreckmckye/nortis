@@ -39,6 +39,16 @@ static const char* MSG_START      = ":;<=> PRESS START TO BEGIN :;<=>";
 static const char* MSG_KREDITS    = "BUILT 2024 WITH";
 static const char* MSG_PSNOOB     = "PSNOOBSDK $";
 
+// Spells out 'notris' when masked & shifted with a 22 bit long mask
+static int32_t titleMask = 0b1000000000000000000000;
+static int32_t titlePattern[5] = {
+  0b1001011101110111010111,
+  0b1101010100100101010100,
+  0b1011010100100110010111,
+  0b1001010100100101010001,
+  0b1001011100100101010111
+};
+
 /**
  * Private functions
  * ============================================================================
@@ -122,6 +132,16 @@ static void renderKredits() {
   MAIN_TEXT(17, MSG_PSNOOB);
 }
 
+static BlockNames getTitleXColour(int x) {
+  return
+      x < 4 ? BLOCK_S :
+      x < 8 ? BLOCK_L :
+      x < 12 ? BLOCK_T :
+      x < 16 ? BLOCK_J :
+      x < 19 ? BLOCK_I :
+      BLOCK_O;
+}
+
 /**
  * Public functions
  * ============================================================================
@@ -150,6 +170,41 @@ void ui_render(GameState* p_gameState) {
   renderKredits();
 }
 
-void ui_renderTitle(int timer) {
-   gfx_drawFontString(30, 150, MSG_START, 0);
+void ui_renderTitleScreen() {
+  static int32_t titleTimer = 0;
+  
+  // Increments but repeats mid way
+  titleTimer++;
+  if (titleTimer > 1200) {
+    titleTimer = 600;
+  }
+
+  // Flashing text comes in
+  if (titleTimer > 300 && (titleTimer % 60) < 30) {
+    gfx_drawFontString(30, 150, MSG_START, 0);
+  }
+
+  // Determines how quickly we move through the animation
+  int32_t ticks = titleTimer / 2;
+
+  // Dissolve-in the title blocks
+  for (int y = 0; y < 5; y++) {
+    for (int x = 0; x < 22; x++) {
+      int matrixPosition = (y * 22) + x;
+      if (matrixPosition > ticks) {
+        break; // because this 'pixel' of the display is not to be displayed yet
+      }
+
+      int32_t titleLine = titlePattern[y];
+      int32_t bitMask = titleMask >> x;
+      if (titleLine & bitMask) { // there is a 'pixel' at this location to show
+        BlockNames colour = getTitleXColour(x);
+        ui_renderBlock(
+          x + 6, // roughly center marquee
+          y + 8,
+          colour
+        );
+      }
+    }
+  }
 }

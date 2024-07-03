@@ -66,7 +66,7 @@ GameInputs pad_getInput() {
   }
 
   // Continuous actions that repeat quickly as the key is held
-  if (btnHeldFor % 20 == 0) {
+  if (btnHeldFor % 15 == 0) {
     if (btn & PAD_LEFT) return INPUT_LEFT;
     if (btn & PAD_RIGHT) return INPUT_RIGHT;
   }

@@ -18,73 +18,58 @@
 #include "defs.h"
 
 // Spells out 'notris' when masked & shifted with a 22 bit long mask
-static int32_t titleMask = 0b1000000000000000000000;
-static int32_t titlePattern[5] = {
-  0b1001011101110111010111,
-  0b1101010100100101010100,
-  0b1011010100100110010111,
-  0b1001010100100101010001,
-  0b1001011100100101010111
-};
+// static int32_t titleMask = 0b1000000000000000000000;
+// static int32_t titlePattern[5] = {
+//   0b1001011101110111010111,
+//   0b1101010100100101010100,
+//   0b1011010100100110010111,
+//   0b1001010100100101010001,
+//   0b1001011100100101010111
+// };
 
-BlockNames getTitleEffectBlock(int x, int y, int timer) {
-  // Blocks are printed in gradually
-  int ticks = timer / 2;
-  int position = (y * 22) + x;
-  if (position > ticks) {
-    return BLOCK_NONE; // skip if not to be displayed yet
-  }
+// BlockNames getTitleEffectBlock(int x, int y, int timer) {
+//   // Blocks are printed in gradually
+//   int ticks = timer / 2;
+//   int position = (y * 22) + x;
+//   if (position > ticks) {
+//     return BLOCK_NONE; // skip if not to be displayed yet
+//   }
 
-  int32_t line = titlePattern[y];
-  int32_t mask = titleMask >> x;
-  if (line & mask) {
-    // Gradient effect
-    return
-      x < 4 ? BLOCK_S :
-      x < 8 ? BLOCK_L :
-      x < 12 ? BLOCK_T :
-      x < 16 ? BLOCK_J :
-      x < 19 ? BLOCK_I :
-      BLOCK_O;
-  }
-}
+//   int32_t line = titlePattern[y];
+//   int32_t mask = titleMask >> x;
+//   if (line & mask) {
+//     // Gradient effect
+//     return
+//       x < 4 ? BLOCK_S :
+//       x < 8 ? BLOCK_L :
+//       x < 12 ? BLOCK_T :
+//       x < 16 ? BLOCK_J :
+//       x < 19 ? BLOCK_I :
+//       BLOCK_O;
+//   }
+// }
 
 int main(int argc, char** argv) {
+  // Configure graphics
   gfx_init();
   pad_init();
 
   TIM_IMAGE tim;
   gfx_loadFontTexture(&tim);
 
+  // Title screen - helps influence RNG
   bool started = false;
-  int32_t titleTimer = 0;
   while (!started) {
     if (pad_getInput() == INPUT_RESTART) {
       started = true;
     }
 
-    titleTimer++;
-    if (titleTimer > 1200) {
-      titleTimer = 600;
-    }
-
-    for (int y = 0; y < 5; y++) {
-      for (int x = 0; x < 22; x++) {
-        BlockNames titleBlock = getTitleEffectBlock(x, y, titleTimer);
-        if (titleBlock) {
-          ui_renderBlock(x + 6, y + 8, titleBlock);
-        }
-      }
-    }
-
-    if (titleTimer > 300 && (titleTimer % 60) < 30) {
-      ui_renderTitle();
-    }
+    ui_renderTitleScreen();
 
     gfx_endFrame();
   }
 
-  // Set up game state
+  // Set up new game state
   game_actionRestart();
   int tickFrames = 0;
   int tickSpeed = game_getSpeed();

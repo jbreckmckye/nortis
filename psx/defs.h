@@ -16,7 +16,6 @@
 #define DRAW_HEIGHT (HEIGHT - HIDDEN_ROWS)
 #define SIZE_PADDING 20
 #define GRID_BIT_OFFSET 0x8000
-#define TITLE_LINE_BITS 22
 
 // Shim for max/min, just don't use with assignments like i++,j++
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
