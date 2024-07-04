@@ -1,12 +1,21 @@
 # Notris: a block puzzle game for PSOne
 
-Notris is a familiar (but legally distinct!) block puzzle game for the PlayStation 1. It's written in C using PSnoobSDK.
+Notris is a `suspiciously familiar` "block puzzle game" for the PlayStation 1. It's written in C using PSnoobSDK.
 
 This repo contains builds for three platforms:
 
 - ✅ a JavaScript prototype using `<canvas>`
 - ✅ a MacOS C port using SDL
-- ⏳ a PlayStation 1 game
+- ✅ a PlayStation 1 game
+
+## Build / play instructions
+
+- Project requires PSnoobSDK, its headers and a C/CMake environment
+- `/psx` contains the PSOne game source code
+- `build.ps1` is a PowerShell script that runs CMake
+- `iso.xml` configures the generated image. You may want to comment out the `<license>` entry (or provide your
+  own copy of a `license_data.dat` inside the `psx` folder)
+- The generated image will be playable on an emulator or can be burned to a disc
 
 # Notes (WIP)
 
