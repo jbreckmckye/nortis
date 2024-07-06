@@ -1,6 +1,6 @@
-# Notris: a block puzzle game for PSOne
+# Notris: a Tetris clone for the PSOne
 
-Notris is a `suspiciously familiar` "block puzzle game" for the PlayStation 1. It's written in C using PSnoobSDK.
+Notris is a `suspiciously familiar` "tetronimo based game" for the PlayStation 1. It's written in C using PSnoobSDK.
 
 This repo contains builds for three platforms:
 
