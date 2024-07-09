@@ -1,5 +1,3 @@
-# Notris: a Tetris clone for the PSOne
-
 Notris is a `suspiciously familiar` "tetronimo based game" for the PlayStation 1. It's written in C using PSnoobSDK.
 
 This repo contains builds for three platforms:

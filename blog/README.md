@@ -1,32 +1,213 @@
-# Blog
+# Notris: a PlayStation 1 Tetris clone
+
+Notris is a `suspiciously familiar' block puzzle game for the original PSOne. It was written in 2024 using modern tooling
+and [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
+
+(picture)
 
 ## Why write a PSX game in 2024?
 
-## How did they do it in the 90s?
+Last year I managed to get my hands on a very rare, black PlayStation 1 unit. This is called a Net Yaroze and was a Sony
+project to get hobbyists and students into the games industry. It is a special console that, as well as playing ordinary
+PSX games, could play homebrew titles when connected to a PC.
 
-## Breaking down the problem
+(picture)
 
-## Prototyping with `<canvas>`
+Yaroze games were pretty limited as Sony didn't want hobbyists competing with commercial developers. Yaroze games could
+only be played on other Yarozes or as part of special demo discs (like those printed by Official PlayStation Magazine -
+learn more about this [here](https://www.breck-mckye.com/blog/2016/11/net-yaroze/)). They had to fit completely within
+system RAM without access to the CD-ROM or memory card. But it was powerful enough to spring up a small community of
+dedicated indie developers.
 
-## Moving to C
+And now I had my own. It got me thinking: what was it actually like, to write a PlayStation game? Could I actually write
+my own?
 
-(keep brief, solution design comes later, e.g. tetronimos)
+This is about how I wrote a simple homebrew PSX game myself, using an open-source version of the libraries but still
+running on original hardware and written in classic C.
 
-## Setting up a PSX dev environment
+## PlayStation development in the 90s
 
-## "Hello World" on PSX
+PSX games were generally written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
+that slotted into a common IBM PC motherboard and contained the entire PSX system chipset, with extra RAM (8mb instead
+of 2mb), and TTY plus debugger output to the host machine.
 
-(+ showing a logo)
+(Picture)
 
-## A primer on PSX graphics
+Enthusiasts might know about special blue debugging PlayStations. These were very close to retail units but could be
+adapted into devkits using additional hardware. However, the ISA cards were the more usual setup.
 
-## Displaying text
+(Picture)
 
-## Rendering Tetronimos
+It was a fairly developer-friendly design. You could play a game on CRT with retail controllers whilst stepping through
+GDB breakpoints on your Windows 95 PC, leafing through a thick textbook of C SDK functions.
 
-## Controller input
+The SDK was quite feature-rich: in principle you could work entirely in C. The SDK libraries were called PSY-Q, and
+included a compiler program `ccpsx` that was really a frontend over GCC (version 2.9.5). It could compile C++ if desired
+and supported a range of optimisations, although performance critical sections still warranted hand-optimised assembly.
 
-## A title screen
+(You can read about some of Sony's recommended optimisation in [these SCEE
+conference slides](https://psx.arthus.net/sdk/Psy-Q/DOCS/CONF/SCEE/96April/optimize.pdf)).
 
-## All together!
+(Picture)
 
+Although the C SDK made C/C++ a practical necessity, some games made use of dynamic scripting. _Metal Gear Solid_ for
+example embeds a TCL interpreter which is used extensively for level and entity scripting. The _Final Fantasy_ games
+go so far as to embed bytecode interpreters for various field, battle and minigame systems. (I touch on how FFVII
+battle scripts work [here](https://youtu.be/S-8PVydb9CM?si=oU0Rqy6bsd0EVq_F)).
+
+## Breaking down the project
+
+So here's the thing: coming into this project, not only was I completely new to the PSX libraries and architecture, but
+I also didn't actually know C. My professional experience has almost exclusively been in high level languages like
+JavaScript or Haskell. I'd done a little C++, but honestly, modern C++ with smart pointers and lambdas is a totally
+different language. I was treading on foreign ground.
+
+I knew I'd need to take an iterative approach, breaking the project down into milestones:
+
+1. Create a prototype in a technology I know well. In my case, JavaScript and `<canvas>` should work.
+2. Learn C by porting a version of the game to PC or MacOS
+3. Learn PSX by porting that game to the console
+
+## Prototyping in JavaScript
+
+(Picture)
+
+Working in a familiar, user-friendly language would allow me to get to grips with my design and the overall logic. JS is
+a good prototyping language because it is simple, concise, and easy to debug. HTML5 `<canvas>` provides a very simple
+2D graphics API - fine for a Tetris clone.
+
+The danger of a high level language, though, is that some constructs are very difficult to port into something like C.
+So I restricted myself to a subset of the language: very procedural, no closures, no objects and using as little dynamic
+memory as possible.
+
+I was pleased with how it played and could envision converting the code to C. But I was still a long way from playing
+the game on PSX.
+
+_See the code in [/web](./web)._
+
+## Converting to C
+
+I had my logic, so now I needed to build a native version of the game. I ended up picking SDL and MacOS.
+
+As I hinted earlier, I actually had an ulterior motive in this project - to finally learn C. I'd always had something of
+an inferiority complex about not knowing it. C has an intimidating reputation and I feared horror stories of dangling
+pointers, misaligned bytes and the dreaded `segmentation fault: core dumped`.
+
+Actually, working in C was incredibly fun and I really fell in love with the simplicity of its mental model. You start
+from basic primitives like structs and chars and build things up to create an entire working system. A bit like making
+your own Big Mac from scratch, it feels empowering to know every part of it was your own effort - and the result usually
+tastes better, too.
+
+(Picture)
+
+The MacOS game took a few days to port, and I was very satisfied with my first C project. And I hadn't had a single
+segfault!
+
+SDL2 was pretty easy to work with, but there were a few aspects that required me to allocate memory dynamically.
+This would be a no-no on the PlayStation, where the `malloc` provided by the PSX kernel doesn't even work properly.
+And the graphics pipeline would be a new experience entirely...
+
+_See the code in [/macos](./macos)._
+
+## Hello, PSX!
+
+Choosing an sdk, tradeoffs. link to installation instructions
+
+starting with something basic - two bounding squares
+
+### A primer on PSX graphics
+
+graphics pipeline is quite different
+
+every time you want to draw, you hand the GPU a linked list of pointers to 'primitives' / graphics commands. It traverses
+this in reverse order, from the end of the list to the start. Therefore shapes are drawn from highest z coordinate (furthest
+away) to lowest, implementing the painters algorithm
+
+This work has to be synchronised with screen draws - vsync
+
+The gpu can do this at the same time the CPU is working. therefore psx games generally have two primitives buffers and
+two ordering tables, building one whilst drawing the other
+
+### Taking control
+
+how pads work
+no input filtering
+
+### Milestone: bouncing squares
+
+getting to point of simple graphics and controls
+
+## Making a UI...
+
+I had all key pieces prototyped. now I just needed to combine them to implement my tetris clone
+
+first step is the text and overall UI. this had been easy in SDL where I could just load in a front. the psx would be
+much more hands on
+
+there is a debug font, but it's not very good. instead I created a texture using the TIM format and timtool. a few
+details about this
+
+(Picture)
+
+I also wanted a 'frame' for the play pieces to fall into. I wanted this to be more colourful than a plain white square
+the psx supports nice color gradients. I made each corner the colour of a face button
+
+(Picture)
+
+I then started drawing the Tetronimos. These are made of multiple triangles and a quad. On an upscaling emulator they
+look great. The actual rotations are hardcoded, where I treat 16 bit uints like a grid of 4x4 pixels. Then 4 uints 
+encode all the rotations
+
+on an upscaling emulator they look fantastic
+
+(Picture, 1x resolution and 4x resolution)
+
+## Something breaks
+
+Testing tetronimos... black screen
+
+(Picture)
+
+Break down the problem - only when drawing many tetronimos
+hunch: could this be to do with the primitives buffer?
+
+(visualise how this would fail)
+
+testing with printfs
+fixing
+
+(picture)
+
+## Putting it together
+
+I had the graphics and io, what about the logic
+this was very easy to port. able to use a modern compiler with the same pragmas. not using vlas etc
+
+one difference to know, is there is no malloc. psx malloc is broken. not much impact for me, as I'd deliberately
+avoided dynamic memory
+
+### Adding the SCEA logo
+
+license data
+
+(Picture)
+
+### Emulator check
+
+runs on emulator, 60fps even with speed restrictions. looks great with upscaling on
+
+(Picture)
+
+What would happen on an actual console?
+
+## The moment of truth
+
+this started with the yaroze purchase, but I wouldn't actually be playing this on yaroze
+I wanted to actually compile a full, retail-equivalent playstation game, and run it on a grey console
+Having lost my original PSX many years ago I scoured eBay for a model with the ability to play backup discs
+
+burning PSX games is quite tricky these days. oxides, reflectivity, drives. It took some jiggery pokery to get my 
+grey playstation finally booting a backup disc. The only way I could get the console to play my games was if I held it
+on its side. Good enough
+
+...
