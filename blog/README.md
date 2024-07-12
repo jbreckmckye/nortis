@@ -11,10 +11,10 @@ Last year I managed to get my hands on a very rare, black PlayStation 1 unit. Th
 project to get hobbyists and students into the games industry. It is a special console that, as well as playing ordinary
 PSX games, could play homebrew titles when connected to a PC.
 
-(picture)
+![A Net Yaroze console](./yaroze.png)
 
-Yaroze games were pretty limited as Sony didn't want hobbyists competing with commercial developers. Yaroze games could
-only be played on other Yarozes or as part of special demo discs (like those printed by Official PlayStation Magazine -
+Yaroze games were pretty limited as Sony didn't want hobbyists competing with commercial developers. They could
+only be played on other Yarozes or as part of special demo discs (some were distributed by Official PlayStation Magazine -
 learn more about this [here](https://www.breck-mckye.com/blog/2016/11/net-yaroze/)). They had to fit completely within
 system RAM without access to the CD-ROM or memory card. But it was powerful enough to spring up a small community of
 dedicated indie developers.
@@ -27,7 +27,7 @@ running on original hardware and written in classic C.
 
 ## PlayStation development in the 90s
 
-PSX games were generally written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
+PSX games were typically written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
 that slotted into a common IBM PC motherboard and contained the entire PSX system chipset, with extra RAM (8mb instead
 of 2mb), and TTY plus debugger output to the host machine.
 
@@ -38,76 +38,85 @@ adapted into devkits using additional hardware. However, the ISA cards were the 
 
 (Picture)
 
-It was a fairly developer-friendly design. You could play a game on CRT with retail controllers whilst stepping through
+The design was quite developer-friendly. You could play a game on CRT with retail controllers whilst stepping through
 GDB breakpoints on your Windows 95 PC, leafing through a thick textbook of C SDK functions.
 
-The SDK was quite feature-rich: in principle you could work entirely in C. The SDK libraries were called PSY-Q, and
-included a compiler program `ccpsx` that was really a frontend over GCC (version 2.9.5). It could compile C++ if desired
-and supported a range of optimisations, although performance critical sections still warranted hand-optimised assembly.
+In principle, a PSX developer could work entirely in C. The SDK comprised a set of C libraries called PSY-Q, and
+included a compiler program `ccpsx` that was really a frontend over GCC 2.9.5. This supported a range of optimisations, 
+like code inlining and loop unrolling, although performance critical sections still warranted hand-optimised assembly.
 
 (You can read about some of Sony's recommended optimisation in [these SCEE
 conference slides](https://psx.arthus.net/sdk/Psy-Q/DOCS/CONF/SCEE/96April/optimize.pdf)).
 
 (Picture)
 
-Although the C SDK made C/C++ a practical necessity, some games made use of dynamic scripting. _Metal Gear Solid_ for
-example embeds a TCL interpreter which is used extensively for level and entity scripting. The _Final Fantasy_ games
-go so far as to embed bytecode interpreters for various field, battle and minigame systems. (I touch on how FFVII
-battle scripts work [here](https://youtu.be/S-8PVydb9CM?si=oU0Rqy6bsd0EVq_F)).
+C++ was supported by `ccpsx` but had a reputation for generating 'bloated' code, as well as slower compile times. Really
+C was the lingua franca of PSX development, but some projects made use of dynamic scripting languages on top of a base
+engine. _Metal Gear Solid_ embeds TCL scripts for level and entity behaviours, and the _Final Fantasy_ games implement
+module-specific bytecode languages for battles, field and minigame systems. (You can learn about one example of this
+[here](https://youtu.be/S-8PVydb9CM?si=oU0Rqy6bsd0EVq_F)).
 
-## Breaking down the project
+## Taking this on ourselves
 
-So here's the thing: coming into this project, not only was I completely new to the PSX libraries and architecture, but
-I also didn't actually know C. My professional experience has almost exclusively been in high level languages like
-JavaScript or Haskell. I'd done a little C++, but honestly, modern C++ with smart pointers and lambdas is a totally
-different language. I was treading on foreign ground.
+But I came to this from a very different perspective: a software engineer in 2024 who mostly worked on web applications.
+My professional experience had almost exclusively been in high level languages like JavaScript and Haskell; I'd done a
+little OpenGL work and C++, but modern C++ is practically a different language these days. I was treading on foreign
+ground.
 
-I knew I'd need to take an iterative approach, breaking the project down into milestones:
+I knew there more modern PSX SDKs existed for languages like Rust, but I still wanted to experience the flavour of 'real'
+PSX programming the way it had been done back in the 90s. At the same time I didn't want to be stuck using a Windows95
+emulator and DOSBox to run a toolchain from thirty years ago.
 
-1. Create a prototype in a technology I know well. In my case, JavaScript and `<canvas>` should work.
-2. Learn C by porting a version of the game to PC or MacOS
-3. Learn PSX by porting that game to the console
+I figured I'd need to break this down into three steps:
 
-## Prototyping in JavaScript
+1. Create a prototype in a high level language
+2. Port the code into C on Mac / Linux / PC
+3. Pick a PSX toolchain, and port the game to PlayStation
+
+I didn't want my game to by fancy; I wanted something 2D that could be prototyped in a couple of days. In the end I
+settled for a Tetris clone - I figured that would be complex _enough_ to experience what I wanted to experience.
+
+## High level prototype
 
 (Picture)
 
-Working in a familiar, user-friendly language would allow me to get to grips with my design and the overall logic. JS is
-a good prototyping language because it is simple, concise, and easy to debug. HTML5 `<canvas>` provides a very simple
-2D graphics API - fine for a Tetris clone.
+Working in a familiar, user-friendly language would allow me to get to grips with my design and the overall logic. I
+chose JavaScript: it's simple, fairly concise, and easy to debug. HTML5 `<canvas>` provides an easy 2D graphics API. I 
+got to work and had fun tweaking the feel and mechanics of my game.
 
-The danger of a high level language, though, is that some constructs are very difficult to port into something like C.
-So I restricted myself to a subset of the language: very procedural, no closures, no objects and using as little dynamic
-memory as possible.
+At the same time, I had to take care not to trap  myself with a high-level programming style - if I used language 
+features like first-class functions or OOP, I knew I'd struggle to translate the code into plain old C. I needed to be 
+disciplined and only use a subset of JS features that resembled my target language: simple structs, homogenous arrays, 
+plain loops, and as little dynamic memory as possible.
 
-I was pleased with how it played and could envision converting the code to C. But I was still a long way from playing
-the game on PSX.
+## Learning C
 
-_See the code in [/web](./web)._
+So I actually had an ulterior motive taking on this project: it was an excuse to finally learn C. The language loomed
+large in my mind and I'd begun to develop an inferiority complex over not knowing it.
 
-## Converting to C
+C has an intimidating reputation and I feared horror stories of dangling pointers, misaligned reads and the dreaded
+`segmentation fault: core dumped`. More pertinently: I was worried that if I tried to learn C, and failed, I'd discover
+that I wasn't actually a very good programmer after all. There was more than just a PSX hobby project on the line.
 
-I had my logic, so now I needed to build a native version of the game. I ended up picking SDL and MacOS.
+Few problems resist iteration. All I needed was to break down the steps. If I could find a very simple cross-platform
+C graphics library, I could focus on just the core logic and exploring the new language. If I targeted a modern desktop
+OS, the game would be easy to debug and I'd learn from language mistakes quicker. That's why I chose to write phase 2
+for MacOS with [Simple DirectMedia Layer (SDL2)](http://www.libsdl.org/).
 
-As I hinted earlier, I actually had an ulterior motive in this project - to finally learn C. I'd always had something of
-an inferiority complex about not knowing it. C has an intimidating reputation and I feared horror stories of dangling
-pointers, misaligned bytes and the dreaded `segmentation fault: core dumped`.
-
-Actually, working in C was incredibly fun and I really fell in love with the simplicity of its mental model. You start
-from basic primitives like structs and chars and build things up to create an entire working system. A bit like making
-your own Big Mac from scratch, it feels empowering to know every part of it was your own effort - and the result usually
-tastes better, too.
+Despite my fears, I found working in C incredibly fun. Very quickly I found it 'clicked' for me. You start from a set of
+very simple primitives - structs, chars, functions - and build them up as layers of abstraction to eventually find
+yourself in an entire working system. It does require some discipline and clarity to avoid the footguns - it's not a
+language that tolerates imprecision - but there is something very empowering about it, knowing every part of the system was
+something you constructed personally.
 
 (Picture)
 
 The MacOS game took a few days to port, and I was very satisfied with my first C project. And I hadn't had a single
 segfault!
 
-SDL2 was pretty easy to work with, but there were a few aspects that required me to allocate memory dynamically.
+SDL had been a pleasure to work with, but there were a few aspects that required me to allocate memory dynamically.
 This would be a no-no on the PlayStation, where the `malloc` provided by the PSX kernel doesn't even work properly.
 And the graphics pipeline would be a new experience entirely...
-
-_See the code in [/macos](./macos)._
 
 ## Hello, PSX!
 
