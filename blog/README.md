@@ -11,7 +11,7 @@ Last year I managed to get my hands on a very rare, black PlayStation 1 unit. Th
 project to get hobbyists and students into the games industry. It is a special console that, as well as playing ordinary
 PSX games, could play homebrew titles when connected to a PC.
 
-![A Net Yaroze console](yaroze.jpg)
+<img src="yaroze.jpg" width=50% height=50% alt="a Net Yaroze console">
 
 Yaroze games were pretty limited as Sony didn't want hobbyists competing with commercial developers. They could
 only be played on other Yarozes or as part of special demo discs (some were distributed by Official PlayStation Magazine -
