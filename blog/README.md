@@ -11,7 +11,7 @@ Last year I managed to get my hands on a very rare, black PlayStation 1 unit. Th
 project to get hobbyists and students into the games industry. It is a special console that, as well as playing ordinary
 PSX games, could play homebrew titles when connected to a PC.
 
-![A Net Yaroze console](./yaroze.png)
+![A Net Yaroze console](yaroze.jpg)
 
 Yaroze games were pretty limited as Sony didn't want hobbyists competing with commercial developers. They could
 only be played on other Yarozes or as part of special demo discs (some were distributed by Official PlayStation Magazine -
@@ -27,16 +27,18 @@ running on original hardware and written in classic C.
 
 ## PlayStation development in the 90s
 
+_See also: https://www.retroreversing.com/official-playStation-devkit_
+
 PSX games were typically written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
 that slotted into a common IBM PC motherboard and contained the entire PSX system chipset, with extra RAM (8mb instead
 of 2mb), and TTY plus debugger output to the host machine.
 
-(Picture)
+![DTL devkit](devkit.jpg)
 
 Enthusiasts might know about special blue debugging PlayStations. These were very close to retail units but could be
 adapted into devkits using additional hardware. However, the ISA cards were the more usual setup.
 
-(Picture)
+![Blue devkit](devkit-blue.jpg)
 
 The design was quite developer-friendly. You could play a game on CRT with retail controllers whilst stepping through
 GDB breakpoints on your Windows 95 PC, leafing through a thick textbook of C SDK functions.
@@ -48,7 +50,7 @@ like code inlining and loop unrolling, although performance critical sections st
 (You can read about some of Sony's recommended optimisation in [these SCEE
 conference slides](https://psx.arthus.net/sdk/Psy-Q/DOCS/CONF/SCEE/96April/optimize.pdf)).
 
-(Picture)
+![Example optimisations](optimise.png)
 
 C++ was supported by `ccpsx` but had a reputation for generating 'bloated' code, as well as slower compile times. Really
 C was the lingua franca of PSX development, but some projects made use of dynamic scripting languages on top of a base
@@ -122,6 +124,8 @@ And the graphics pipeline would be a new experience entirely...
 
 Choosing an sdk, tradeoffs. link to installation instructions
 
+![PSNoobSDK](psnoob.png)
+
 starting with something basic - two bounding squares
 
 ### A primer on PSX graphics
@@ -131,6 +135,8 @@ graphics pipeline is quite different
 every time you want to draw, you hand the GPU a linked list of pointers to 'primitives' / graphics commands. It traverses
 this in reverse order, from the end of the list to the start. Therefore shapes are drawn from highest z coordinate (furthest
 away) to lowest, implementing the painters algorithm
+
+![Graphics cycle](gfx-cycle.png)
 
 This work has to be synchronised with screen draws - vsync
 
