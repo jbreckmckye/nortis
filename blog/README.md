@@ -5,6 +5,10 @@ powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 (picture)
 
+Quick links:
+- [Notris code + build instructions]
+- [Skip past introduction to "Hello PSX"]
+
 ## Why write a PSX game in 2024?
 
 Last year I got my hands on a rare, black PlayStation 1. This is called a Net Yaroze and is a special console that can
@@ -120,7 +124,7 @@ SDL had been a pleasure to work with, but there were a few aspects that required
 This would be a no-no on the PlayStation, where the `malloc` provided by the PSX kernel doesn't work properly. And the 
 graphics pipeline would be an even bigger leap...
 
-## Hello, PSX!
+## Hello world on PSX
 
 When it comes to PlayStation SDKs there are two major options: you can either go with the original Psy-Q library with modernised toolchain ("Nugget"), or the open source PSNoobSDK.
 
@@ -135,6 +139,9 @@ I ended up selecting [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK): it has
 My first task was a kind of hello world: two bouncing squares on a coloured background.
 
 ### A primer on PSX graphics
+
+dual buffer & memory mapping
+unified memory model
 
 graphics pipeline is quite different
 
