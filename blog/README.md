@@ -1,6 +1,6 @@
 # Notris: a Tetris clone for the PlayStation 1
 
-This is a modern homebrew PSX game written in C using modern tooling. It's fully playable on original hardware and is
+Notris is a modern homebrew PSX game written in C using modern tooling. It's fully playable on original hardware and is
 powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 (picture)
@@ -16,16 +16,14 @@ into the games industry.
 </p>
 
 Yaroze games were very limited, as Sony didn't want bedroom coders competing with commercial developers. They could only
-be played on other Yarozes or as part of special demo discs (more info about this
+be played on other Yarozes or as part of special demo discs (info about those
 [here](https://www.breck-mckye.com/blog/2016/11/net-yaroze/)). The games had to fit entirely within system RAM without
 access to the CD-ROM or memory card. Despite these limitations, the Yaroze fostered a passionate online community of
 indie game developers.
 
-And now I finally had my own. Which got me thinking: what was it actually like, to write a PlayStation game?
-Could I write my own?
+And now I finally had my own. It got me thinking: what was it actually like, to write a PlayStation game? Could I write my own?
 
-This is about how I wrote a simple homebrew PSX game myself, using an open-source version of the libraries but still
-running on original hardware and written in classic C.
+This is about how I wrote a simple homebrew PSX game myself, using an open-source version of the libraries but still running on original hardware and written in classic C.
 
 ## PlayStation development in the 90s
 
@@ -35,9 +33,9 @@ of 2mb), and TTY plus debugger output to the host machine.
 
 ![DTL devkit](devkit.jpg)
 
-You might have heard about special blue PlayStations. These were for debugging rather than development and their only
-major difference from retail hardware is that they could play burned CD-ROMs without anti-piracy checks. However, at
-least one company sold a special kit to convert these into devkits:
+You might have heard about blue PlayStations. These were for QA rather than development and their only
+major feature is that they can play burned CD-ROMs without anti-piracy checks. However, at
+least one company sold a special kit to convert QA units into devkits:
 
 ![Blue devkit](devkit-blue.jpg)
 
@@ -62,7 +60,7 @@ _Further reading: https://www.retroreversing.com/official-playStation-devkit_
 
 ## Writing my own PSX game
 
-I came to this from a very different perspective: a software engineer in 2024 who mostly worked on web applications.
+But I came to this from a very different perspective: a software engineer in 2024 who mostly worked on web applications.
 My professional experience had almost exclusively been in high level languages like JavaScript and Haskell; I'd done a
 little OpenGL work and C++, but modern C++ is practically a different language these days.
 
@@ -83,13 +81,12 @@ figured that would be complex _enough_ to experience what I wanted to experience
 
 (Picture)
 
-Working in a familiar language would allow me to get to grips with the overall design and logic. I chose JavaScript: 
-it's simple, fairly concise, and easy to debug. HTML5 `<canvas>` provides an easy 2D graphics API.
+Working in a familiar language would allow me to get to grips with the overall design and logic, independently of learning C. I chose JavaScript: it's simple, fairly concise, and easy to debug. HTML5 `<canvas>` provides a simple 2D graphics API.
 
 The prototype came together fast and I had fun tweaking the mechanics of my game. At the same time, I was wary not to
-trap myself in too high-level a programming style - if I used features like object-orientation or functional programming,
-I'd struggle to port the code to plain old C. I restricted myself to a subset of JavaScript that resembled my target
-language: simple structs, plain loops, and very simple memory use.
+trap myself with an overly high-level  programming style - if I used features like object-orientation or functional programming,
+I'd struggle to port the code to plain old C. I restricted myself to a subset of JavaScript that resembled the target
+language: simple structs, plain loops, and basic functions.
 
 ## Learning C
 
@@ -102,12 +99,12 @@ that I wasn't actually a very good programmer after all.
 
 Like most software development problems, I just needed to it down into smaller steps:
 
-- If I could find a simple C graphics library, I could focus on just the logic
-- If I targeted MacOS, it would be easy to debug my program and understand my C newbie mistakes
+- If I could find a simple C graphics library, I could focus on the logic
+- If I targeted MacOS, it would be easy to debug and learn from mistakes
 - If I could get that working, then I could figure out how to port the graphics and controls to PSX
 
 The framework I went for was [SDL2](http://www.libsdl.org/). Maybe there are fancier libraries, maybe there are newer
-technologies, but it seemed good enough for what I wanted. I needed to stop procrastinating and write - my first C
+ones, but it seemed good enough for what I wanted. I needed to stop procrastinating and write... my first C
 program!
 
 Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. You start from very simple primitives - 
@@ -126,6 +123,7 @@ This would be a no-no on the PlayStation, where the `malloc` provided by the PSX
 graphics pipeline would be an even bigger leap...
 
 ## Hello, PSX!
+
 
 Choosing an sdk, tradeoffs. link to installation instructions
 
