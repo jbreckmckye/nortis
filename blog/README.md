@@ -29,17 +29,17 @@ This is about how I wrote a simple homebrew PSX game myself, using an open-sourc
 
 PSX games were typically written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
 that slotted into a common IBM PC motherboard and contained the entire PSX system chipset, with extra RAM (8mb instead
-of 2mb), and TTY plus debugger output to the host machine.
+of 2mb), and TTY + debugger output to the host machine.
 
 ![DTL devkit](devkit.jpg)
 
 You might have heard about blue PlayStations. These were for QA rather than development and their only
 major feature is that they can play burned CD-ROMs without anti-piracy checks. However, at
-least one company sold a special kit to convert QA units into devkits:
+least one company sold a special kit to convert QA systems into devkits:
 
 ![Blue devkit](devkit-blue.jpg)
 
-The design was very developer-friendly. You could play your game on CRT with retail controllers whilst stepping through
+The design was very developer-friendly. You could play your game on CRT with normal controllers whilst stepping through
 GDB breakpoints on your Windows 95 PC, leafing through a thick textbook of C SDK functions.
 
 In principle, a PSX developer could work entirely in C. The SDK comprised a set of C libraries called PSY-Q, and
@@ -71,8 +71,8 @@ through.
 I decided to break the project down into three steps:
 
 1. Create a prototype in a high level language
-2. Port the code into C for a desktop app
-3. Pick a PSX toolchain, and port the game to PlayStation
+2. Port the code into C for a desktop game
+3. Pick a PSX toolchain, and port to PlayStation
 
 The game needed to be something 2D that could be prototyped in a couple of days. I settled for a Tetris clone - I 
 figured that would be complex _enough_ to experience what I wanted to experience.
@@ -81,12 +81,10 @@ figured that would be complex _enough_ to experience what I wanted to experience
 
 (Picture)
 
-Working in a familiar language would allow me to get to grips with the overall design and logic, independently of learning C. I chose JavaScript: it's simple, fairly concise, and easy to debug. HTML5 `<canvas>` provides a simple 2D graphics API.
+Working in a familiar language would allow me to get to grips with the overall design and logic, independently of learning C. I chose JavaScript: it's simple, easy to debug, and has the HTML5 `<canvas>` graphics API.
 
-The prototype came together fast and I had fun tweaking the mechanics of my game. At the same time, I was wary not to
-trap myself with an overly high-level  programming style - if I used features like object-orientation or functional programming,
-I'd struggle to port the code to plain old C. I restricted myself to a subset of JavaScript that resembled the target
-language: simple structs, plain loops, and basic functions.
+The prototype came together fast and I had fun tweaking the mechanics of my game. At the same time, I was wary that if I used high-level language features like object-orientation or functional programming,
+I'd struggle to port the code to plain old C. So I restricted myself to a subset of JavaScript: simple structs, plain loops, and basic functions.
 
 ## Learning C
 
@@ -99,12 +97,12 @@ that I wasn't actually a very good programmer after all.
 
 Like most software development problems, I just needed to it down into smaller steps:
 
-- If I could find a simple C graphics library, I could focus on the logic
-- If I targeted MacOS, it would be easy to debug and learn from mistakes
-- If I could get that working, then I could figure out how to port the graphics and controls to PSX
+- with a simple C graphics library, I could focus on the logic
+- if I built for desktop, I could iterate fast
+- once the desktop version worked, I could tackle the PSX specifics individually
 
-The framework I went for was [SDL2](http://www.libsdl.org/). Maybe there are fancier libraries, maybe there are newer
-ones, but it seemed good enough for what I wanted. I needed to stop procrastinating and write... my first C
+The framework I went for was [SDL2](http://www.libsdl.org/). Maybe there are fancier libraries, or newer
+ones, but this seemed _good enough_. I needed to stop procrastinating and write... my first C
 program!
 
 Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. You start from very simple primitives - 
@@ -115,7 +113,7 @@ bottom.
 
 (Picture)
 
-The MacOS game took a few days to port, and I was very satisfied with my first C project. Plus, I hadn't had a single
+"Notris" only took a few days to port, and I was very satisfied with my first C project. Plus, I hadn't had a single
 segfault!
 
 SDL had been a pleasure to work with, but there were a few aspects that required me to allocate memory dynamically.
@@ -124,11 +122,11 @@ graphics pipeline would be an even bigger leap...
 
 ## Hello, PSX!
 
-When it comes to PlayStation SDKs there are essentially two major options: you can either go with the original Psy-Q library using a modernised toolchain ("Nugget"), or the open source PSNoobSDK.
+When it comes to PlayStation SDKs there are two major options: you can either go with the original Psy-Q library with modernised toolchain ("Nugget"), or the open source PSNoobSDK.
 
-It's actually quite plausible to work without any SDK at all - PSX hardware works via memory-mapped I/O, so you could just cast pointers - but this is probably a little excessive for a newbie project.
+It's actually quite plausible to work without any SDK at all - they are just wrappers for memory-mapped I/O - but that might be a bit ambitious for a first project.
 
-The biggest issue with Psy-Q is that it's still Sony proprietary code. Legally that puts homebrew software at risk, and is the same issue the recent [Portal64](https://github.com/Valkirie/portal64) demake fell foul of, by statically linking Nintendo's LibUltra code.
+The biggest issue with Psy-Q is that it's Sony proprietary code. Legally that puts any homebrew at risk. This was the same issue the recent [Portal64](https://github.com/Valkirie/portal64) demake fell foul of, by statically linking Nintendo's LibUltra code.
 
 I ended up selecting [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK): it has a very similar API to PsyQ, but is legally safer and has very approachable documentation. Feel free to quit reading in disgust if that offends the PSX purist in you.
 
