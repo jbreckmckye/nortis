@@ -124,12 +124,17 @@ graphics pipeline would be an even bigger leap...
 
 ## Hello, PSX!
 
+When it comes to PlayStation SDKs there are essentially two major options: you can either go with the original Psy-Q library using a modernised toolchain ("Nugget"), or the open source PSNoobSDK.
 
-Choosing an sdk, tradeoffs. link to installation instructions
+It's actually quite plausible to work without any SDK at all - PSX hardware works via memory-mapped I/O, so you could just cast pointers - but this is probably a little excessive for a newbie project.
+
+The biggest issue with Psy-Q is that it's still Sony proprietary code. Legally that puts homebrew software at risk, and is the same issue the recent [Portal64](https://github.com/Valkirie/portal64) demake fell foul of, by statically linking Nintendo's LibUltra code.
+
+I ended up selecting [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK): it has a very similar API to PsyQ, but is legally safer and has very approachable documentation. Feel free to quit reading in disgust if that offends the PSX purist in you.
 
 ![PSNoobSDK](psnoob.png)
 
-starting with something basic - two bounding squares
+My first task was a kind of hello world: two bouncing squares on a coloured background.
 
 ### A primer on PSX graphics
 
