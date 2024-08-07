@@ -120,7 +120,7 @@ When it comes to PlayStation homebrew there are two major choices for your SDK. 
 2. The new **PSNoobSDK** which is open source
 
 There are a couple of other options like the C++ **Psy-Qo**, and you can even forgo any SDK just to do memory-mapped I/O
-yourself - but that would be quite ambitious for a first project.
+yourself - but I was not brave enough for that.
 
 The biggest issue with Psy-Q is that it's still Sony proprietary code, even 30 years later. Legally any homebrew built
 with it is at risk. This is what sunk the [Portal64](https://github.com/Valkirie/portal64) demake: it statically linked `libultra`, which is Nintendo's
