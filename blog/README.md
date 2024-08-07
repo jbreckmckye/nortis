@@ -75,38 +75,37 @@ figured that would be complex _enough_ to experience what I wanted to experience
 
 ## Prototyping in a high level language
 
-The first step was to build a basic prototype in a language I already knew. This would help me nail down the design. Once I had the skeleton of the game, my thinking went, I could translate this into C.
+The first step was to build a prototype in a familiar technology. This would allow me to nail down the basic design. My thinking was that the logic could then be translated piecemeal into C.
 
 (Picture)
 
-For this I chose JavaScript: it's simple, concise, easy to debug, and sports the HTML5 `<canvas>` graphics API.
+As a web developer the most obvious technology was JavaScript: it's simple, concise, easy to debug, and sports the HTML5 `<canvas>` graphics API.
 
-At the same time, I was wary that more high-level JavaScript features would be difficult to port into C. Anything using classes or closures would need to be completely rewritten, so, I was very careful to restrict myself to a simple, procedural subset of JS.
-
-The game came together fast and I had fun tweaking its mechanics. But I had really barely begun.
+At the same time, I was wary that more high-level JavaScript features would be difficult to port into C. Anything using classes or closures would need to be completely rewritten, so I was careful to restrict myself to a simple, procedural subset of the language.
 
 ## Learning C!
 
-I really had an ulterior motive taking on this project: it was an excuse to finally learn C. The language loomed
+Now, I actually had an ulterior motive taking on this project: it was an excuse to finally learn C. The language loomed
 large in my mind and I'd begun to develop an inferiority complex over not knowing it.
 
 C has an intimidating reputation and I feared horror stories of dangling pointers, misaligned reads and the dreaded
 `segmentation fault`. More precisely: I was worried that if I tried to learn C, and failed, I'd discover
-that I wasn't actually a good programmer after all.
+that I wasn't actually a very good programmer after all.
 
-To keep things simple I decided I'd use [SDL2](http://www.libsdl.org/) to handle the input and graphics, and compile for
-MacOS to keep debugging as quick as possible.
+To keep things easy I figured I could use [SDL2](http://www.libsdl.org/) to handle the input and graphics, and compile for my desktop environment 
+(MacOS) for a fast build / debug cycle.
 
-## Porting to desktop
+## Writing the desktop app
 
 Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. You start from very simple primitives - 
 structs, chars, functions - and build them up into layers of abstraction to eventually find yourself in an entire 
-working system. Learning C made me rethink a lot of my values as a programmer, coming from a more functional
-background.
+working system.
+
+Learning C made me rethink a lot of my values as a programmer, coming from a more functional background. I was surprised at how productive such a "basic" language could be.
 
 (Picture)
 
-"Notris" only took a few days to port, and I was very satisfied with my first C project. Plus, I hadn't had a single
+"Notris" only took a few days to port, and I was very satisfied with my first true C project. And I hadn't had a single
 segfault!
 
 SDL had been a pleasure to work with, but there were a few aspects that required me to allocate memory dynamically.
