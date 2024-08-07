@@ -150,7 +150,7 @@ other one is sent to screen. So we need to allocate two frame buffers:
 ![PSX VRAM allocation](psx-vram-allocation.png)
 
 (Now you can see why 640x480 isn't practical - there isn't enough space for 2x480p buffers. But this mode CAN be used
-by things like the PSX startup logo, which doesn't need any animation)
+by things like the PSX startup logo, which doesn't need complex animation)
 
 The buffers (referred to alternately as display and draw environments) are swapped every frame. Most PSX games target 
 30fps (in North America) but the actual VSync interrupt comes at 60hz. (Tekken 3, rather impressively, runs at full
