@@ -70,37 +70,34 @@ I knew PSX SDKs existed for languages like Rust, but I wanted to experience the 
 way it had been done back in the 90s. So it would be modern toolchains and open source libraries, but C all the way
 through.
 
-I decided to break the project down into three steps:
-
-1. Create a prototype in a high level language
-2. Port the code into C for a desktop game
-3. Pick a PSX toolchain, and port to PlayStation
-
 The game needed to be something 2D that could be prototyped in a couple of days. I settled for a Tetris clone - I 
 figured that would be complex _enough_ to experience what I wanted to experience.
 
 ## Prototyping in a high level language
 
+The first step was to build a basic prototype in a language I already knew. This would help me nail down the design. Once I had the skeleton of the game, my thinking went, I could translate this into C.
+
 (Picture)
 
-Prototyping in a familiar language would allow me to quickly iterate my design. I chose JavaScript: it's simple, easy 
-to debug, and has the HTML5 `<canvas>` graphics API.
+For this I chose JavaScript: it's simple, concise, easy to debug, and sports the HTML5 `<canvas>` graphics API.
 
-The game came together fast and I had fun tweaking its mechanics. At the same time, I was wary that I'd struggle to port
-the code into C if I used too many high-level language features like object orientation or functional programming. So
-I restricted myself to a very simple, procedural style that would carry across well.
+At the same time, I was wary that more high-level JavaScript features would be difficult to port into C. Anything using classes or closures would need to be completely rewritten, so, I was very careful to restrict myself to a simple, procedural subset of JS.
 
-## Learning C
+The game came together fast and I had fun tweaking its mechanics. But I had really barely begun.
+
+## Learning C!
 
 I really had an ulterior motive taking on this project: it was an excuse to finally learn C. The language loomed
 large in my mind and I'd begun to develop an inferiority complex over not knowing it.
 
 C has an intimidating reputation and I feared horror stories of dangling pointers, misaligned reads and the dreaded
 `segmentation fault`. More precisely: I was worried that if I tried to learn C, and failed, I'd discover
-that I wasn't actually a very good programmer after all.
+that I wasn't actually a good programmer after all.
 
 To keep things simple I decided I'd use [SDL2](http://www.libsdl.org/) to handle the input and graphics, and compile for
-MacOS to keep debugging as quick as possible. MacOS ships with a workable C toolchain and memory leak analysis.
+MacOS to keep debugging as quick as possible.
+
+## Porting to desktop
 
 Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. You start from very simple primitives - 
 structs, chars, functions - and build them up into layers of abstraction to eventually find yourself in an entire 
@@ -138,7 +135,7 @@ using a non-authentic SDK offends the PSX purist in you, feel free to quit readi
 
 My first task was a kind of hello world: two squares on a coloured background. Sounds simple, right?
 
-### A primer on PSX graphics
+## A primer on PSX graphics
 
 (*Some of this is simplified. For a more authoritative guide hit the [PSNoobSDK tutorial](http://lameguy64.net/tutorials/pstutorials/chapter1/1-display.html))
 
