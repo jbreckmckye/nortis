@@ -6,7 +6,7 @@ powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 (picture)
 
 - [Skip the introduction, go to the technical stuff](#hello-psx)
-- [View code]
+- [Skip the technical stuff, read about the project](#back-to-the-project)
 
 ## Why write a PSX game in 2024?
 
@@ -86,17 +86,15 @@ The first step was to build a prototype in a familiar technology. This would all
 then the logic could be translated piecemeal into C.
 
 As a web developer the most obvious technology for prototyping was JavaScript: it's simple, concise, easy to debug, and
-it sports the HTML5 `<canvas>` graphics API.
-
-At the same time, I was wary that more high-level JavaScript features would be difficult to port into C. Anything using
-classes or closures would need to be completely rewritten, so I was careful to restrict myself to a simple, procedural
-subset of the language: loops, structs and static types wherever possible.
-
-_The JavaScript prototype was pretty quick:_
+it sports the HTML5 `<canvas>` graphics API. "Notris" came together very quickly
 
 <p align="center">
   <img src="web.png" width=50% height=50% alt="web version of tetris">
 </p>
+
+At the same time, I was wary that more high-level JavaScript features would be difficult to port. Anything using
+classes or closures would need to be completely rewritten, so I was careful to restrict myself to a simple, procedural
+subset of the language.
 
 ## Learning C!
 
@@ -110,19 +108,14 @@ that I wasn't actually a very good programmer after all.
 To keep things easy I figured I could use [SDL2](http://www.libsdl.org/) to handle the input and graphics, and compile for my desktop 
 environment (MacOS). That would give me a fast build / debug cycle and make the learning curve as gentle as possible.
 
-### Writing my first C project
-
 Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. You start from very simple primitives - 
-structs, chars, functions - and build them up into layers of abstraction to eventually find yourself in an entire 
+structs, chars, functions - and build them up into layers of abstraction to eventually find yourself sat atop an entire 
 working system.
 
-Learning C made me rethink a lot of my values as a programmer, coming from a more functional background. I was 
-surprised at how productive such a "basic" language could be. Some time I might write about that.
+!["Notris" with SDL2](sdl2.png)
 
-(Picture)
-
-"Notris" only took a few days to port, and I was very satisfied with my first true C project. And I hadn't had a single
-segfault!
+"Notris" only took a couple of days to port, and I was very satisfied with my first true C project. And I hadn't had a
+single segfault!
 
 SDL had been a pleasure to work with, but there were a few aspects that required me to allocate memory dynamically.
 This would be a no-no on the PlayStation, where the `malloc` provided by the PSX kernel doesn't work properly. And the 
@@ -171,7 +164,7 @@ the other is sent to screen. So we need to allocate two frame buffers:
 </p>
 
 (Now you can see why 640x480 isn't practical - there isn't enough space for two 480p buffers. But this mode CAN be used
-by things like the PSX startup logo, which doesn't need dual-buffer animation)
+by things like the PSX startup logo, which doesn't need much animation)
 
 The buffers (referred to alternately as display and draw environments) are swapped every frame. Most PSX games target 
 30fps (in North America) but the actual VSync interrupt comes at 60hz. Some games manage to run at full 60 fps - Tekken
@@ -180,36 +173,35 @@ The buffers (referred to alternately as display and draw environments) are swapp
 ### Shapes to screen
 
 But - how does the drawing process work? This is done by the GPU, but the PSX GPU works very differently to a modern
-graphics card. Essentially, every frame the DMA transfers a linked list of graphics 'packets' or commands that describe
-shapes, colours and textures to be drawn: draw this triangle here, load this texture, skin this quad, etc.
+graphics card. Essentially, every frame the GPU is sent an ordered list of graphics 'packets' or commands. "Draw a
+triangle here", "load this texture to skin the next quad", et cetera.
 
-The GPU does not do 3D transformations; that is the job of the GTE (Geometry Transform Engine) coprocessor. The GTE 
-communicates with the CPU program via registers. The GPU just processes these lists of commands, arranged in what are
-called 'ordering tables' for reasons that'll soon become clear.
+The GPU does not do 3D transformations; that is the job of the GTE (Geometry Transform Engine) coprocessor. The GPU 
+commands represent purely 2D graphics, already manipulated by 3D hardware.
 
 That means the path of a PSX pixel goes as follows:
 
-1. The program on the CPU creates the primitive
-2. (Optionally) the GTE is triggered to do some 3D stuff
-3. These primitives are allocated in memory and linked into the ordering table
-4. The program signals the DMA to transfer the ordering table of graphics commands
-5. The GPU gets busy processing these commands and outputting VRAM pixels (rasterization)
-6. The framebuffers are swapped and the raster is to be displayed
-7. Video output hardware scans the lines into a video signal
+1. The program on the CPU creates the primitive (e.g. a textured triangle)
+2. (Optionally) the GTE does 3D maths / transformations on the primitive
+3. These primitives / packets are linked into an 'ordering table'
+4. An SDK function goes through the ordering table and sends the packets to the GPU
+5. The GPU processes the packets / commands to output VRAM pixels (rasterization)
+6. The framebuffers are swapped. The raster from the last drawEnv is now the displayEnv.
+7. Video output hardware scans lines from the raster into a video signal
 
-So in pseudocode the PSX frame loop goes like this
+So in pseudocode the PSX frame loop (basically) goes like this
 
 ```
-FrameBuffer 0, 1
-OrderingTable 0, 1
+FrameBuffer [0, 1]
+OrderingTable [0, 1]
 
 id = 1 // flips every frame
 
 loop {
-  // Game logic, check controllers, etc.
+  // Game logic
 
-  // Construct the graphics and place into a command ordering table
-  MakeGraphicsCommands(OrderingTable[id])
+  // Construct the next screen by populating the current ordering table
+  MakeGraphics(OrderingTable[id])
   
   // Wait for last draw to finish; wait for vertical blank
   DrawSync()
@@ -220,7 +212,9 @@ loop {
   
   // Start drawing current frame
   SetDrawing(Framebuffer[id])
-  StartDrawing(OrderingTable[id])
+  
+  // Send ordering table contents to GPU via DMA
+  Transfer(OrderingTable[id])
 
   // Flip
   id = !id
@@ -235,21 +229,32 @@ drawing frame 3.
 
 ### Ordering tables and z-indexes
 
-The GPU is a completely 2D piece of hardware, it doesn't know about z-coordinates in 3D space. There is no z-buffer to
-describe occlusion - i.e. which objects are in front of others. Instead, the GPU relies on the command table being **ordered**
-so that objects furthest from the camera are at the end. Then it traverses the linked list in reverse order to implement
-the **painter's algorithm**.
+As mentioned, the GPU is a completely 2D piece of hardware, it doesn't know about z-coordinates in 3D space. There is no
+"z-buffer" to describe occlusions - i.e. which objects are in front of others. So how are items sorted in front of others?
 
-[!Diagram of ordering table traversal](ordering-table-traversal.png)
+The way it works is that the ordering table comprises a reverse-linked chain of graphics commands. These are traversed
+back-to-front to implement the **painter's algorithm**.
 
-That is why the command list is called an 'ordering table'. Think of each element in the OTable representing something 
-like a CSS `z-index`. You can have as many levels as you like, and lower values are closer to the camera.
+![How a scene is made from an ordering table](ordering-table-scene.png)
+
+To be precise, the ordering table is a reverse-linked list. Each item has a pointer to the previous item in the list, 
+and we add primitives by inserting them into the chain. Generally OTs are initialised as a fixed array, with each
+element in the array representing a 'level' or layer in the display. OTs can be nested for implementing complex scenes.
+
+The following diagram helps 
+explain it ([source](https://psx.arthus.net/sdk/Psy-Q/DOCS/TECHNOTE/ordtbl.pdf))
+
+![Ordering table](ordering-table.png)
 
 This approach isn't perfect and sometimes PSX geometry shows weird clipping, because each poly can only be at a single
 'z index' in screen space, but it works well enough for most games. These days such limitations are considered part of 
 the PSX's distinctive charm.
 
 ## Show me some code!
+
+We've talked a lot of theory - what does this look like in practice?
+
+This section won't go through all the code line-by-line but should give you a taster for PSX graphics concepts.
 
 The first thing we need are some structs to contain our buffers. We will have a `RenderContext` that contains two
 `RenderBuffers`, and each `RenderBuffer` will contain:
@@ -279,8 +284,10 @@ typedef struct {
 static RenderContext ctx = { 0 };
 ```
 
-The key thing is that the `bufferID` gets swapped every frame, and the `p_primitive` starts at the beginning of the
-current `primitivesBuffer` and is incremented every time we allocate space from it.
+Every frame we will invert the `bufferID` which means we can seamlessly work on one frame whilst the other is being
+displayed. A key detail is that the `p_primtive` is constantly kept pointed at the next byte in the current
+`primitivesBuffer`. It is imperative this is incremented every time a primitive is allocated, and reset at the end
+of every frame.
 
 Like all C programs we need a `main`. The actual arguments are not populated with anything useful but PSX toolchains are
 picky about the signature here:
@@ -308,9 +315,9 @@ I am being quite condensed here - and skipping a few steps - but from here every
 while (1) {
   // do game stuff... create graphics for next frame...
 
-  // end of while loop
+  // at the end of loop body
   
-  // wait for drawing to finish, then next vblank interval
+  // wait for drawing to finish, wait for next vblank interval
   DrawSync(0);
   VSync(0);
 
@@ -322,7 +329,7 @@ while (1) {
   PutDispEnv(p_dispenv);
   PutDrawEnv(p_drawenv);
   
-  // Send ordering table commands to GPU via DMA, starting from the *end* of the table (because it's a reversed list)
+  // Send ordering table commands to GPU via DMA, starting from the end of the table
   DrawOTagEnv(p_ordertable + OT_SIZE - 1, p_drawEnv);
   
   // Swap buffers and clear state for next frame
@@ -332,13 +339,13 @@ while (1) {
 }
 ```
 
-This might be a lot to take in. Don't worry. You don't really _have_ to understand this.
+This might be a lot to take in. Don't worry.
 
 <p align="center">
   <img src="shocked.png" width=50% height=50% alt="psx vram model">
 </p>
 
-If you _do_ want to understand this, the best thing is to take a look at [`hello-psx/main.c`](../hello-psx/main.c).
+If you really want to understand this, the best thing is to take a look at [`hello-psx/main.c`](../hello-psx/main.c).
 Everything is commented in a fair amount of detail. Alternatively, go through the
 [PSNoobSDK tutorial](http://lameguy64.net/tutorials/pstutorials/)... it's pretty terse and quite clearly written.
 
@@ -349,7 +356,7 @@ Now... how do we draw stuff? We write structs into our primitives buffer. This b
 // Create a tile primitive in the primitive buffer
 // We cast p_primitive as a TILE*, so that its char used as the head of the TILE struct
 TILE* p_tile = (TILE*)p_primitive;
-setTile(p_tile);
+setTile(p_tile); // very very important to call this macro
 setXY0 (p_tile, x, y);
 setWH  (p_tile, width, width);
 setRGB0(p_tile, 252, 32, 3);
@@ -362,16 +369,19 @@ addPrim(ordering_table[buffer_id] + z, p_primitive);
 ctx.p_primitive += sizeof(TILE);
 ```
 
-## Completing the 'hello world'
+We just inserted an orange rectangle! Try to contain your excitement.
 
-Okay. So our first task was just a simple program: two squares on a screen. One moves around automatically, the other is
-controlled by joypad. Here's what the end result looks like - not much of a 'game', but it puts together graphics,
-logic and controls.
+## Back to the project
 
-![My hello world game](hello-world.png)
+At this point in my journey all I really had was a "hello world" demo program, with basic graphics and controller input.
+You can see from the code in [`hello-psx`](../hello-psx) that I was documenting as much as possible, really for my own
+benefit. A working program was a positive step but not a real game.
 
+![Hello PSX game](hello-psx.png)
 
-## Making a UI...
+It was time to get real.
+
+### Making a UI
 
 I had all key pieces prototyped. now I just needed to combine them to implement my tetris clone
 
@@ -396,7 +406,7 @@ on an upscaling emulator they look fantastic
 
 (Picture, 1x resolution and 4x resolution)
 
-## Something breaks
+### Something breaks
 
 Testing tetronimos... black screen
 
@@ -412,10 +422,12 @@ fixing
 
 (picture)
 
-## Putting it together
+### Porting the logic
 
 I had the graphics and io, what about the logic
 this was very easy to port. able to use a modern compiler with the same pragmas. not using vlas etc
+
+insight: says a lot about C's portability
 
 one difference to know, is there is no malloc. psx malloc is broken. not much impact for me, as I'd deliberately
 avoided dynamic memory
@@ -426,7 +438,7 @@ license data
 
 (Picture)
 
-### Emulator check
+## Building and running
 
 runs on emulator, 60fps even with speed restrictions. looks great with upscaling on
 

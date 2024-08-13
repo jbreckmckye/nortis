@@ -101,7 +101,7 @@ static void renderControls(bool isAlive) {
   }
 }
 
-static void renderScores(int score, int lines) {
+static void renderScores(int lines, int score) {
   int y1 = Y_POS(3);
   int y2 = Y_POS(4);
   int x2 = TITLE_X + (FONT_GLYPH_SIZE * 6);
