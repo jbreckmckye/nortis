@@ -181,13 +181,17 @@ commands represent purely 2D graphics, already manipulated by 3D hardware.
 
 That means the path of a PSX pixel goes as follows:
 
+![Pixel path](pixel-path.png)
+
 1. The program on the CPU creates the primitive (e.g. a textured triangle)
 2. (Optionally) the GTE does 3D maths / transformations on the primitive
 3. These primitives / packets are linked into an 'ordering table'
 4. An SDK function goes through the ordering table and sends the packets to the GPU
-5. The GPU processes the packets / commands to output VRAM pixels (rasterization)
-6. The framebuffers are swapped. The raster from the last drawEnv is now the displayEnv.
-7. Video output hardware scans lines from the raster into a video signal
+5. The GPU processes the packets / commands from a FIFO queue
+6. The GPU outputs VRAM pixels (rasterisation)
+7. The framebuffers are swapped and the displayEnv is set
+8. Video output hardware scans lines from the raster into a video signal
+9. Your (analog) TV turns lines into an electron scanning beam! Coloured dots of phosphor glow!
 
 So in pseudocode the PSX frame loop (basically) goes like this
 
@@ -254,7 +258,8 @@ the PSX's distinctive charm.
 
 We've talked a lot of theory - what does this look like in practice?
 
-This section won't go through all the code line-by-line but should give you a taster for PSX graphics concepts.
+This section won't go through all the code line-by-line but should give you a taster for PSX graphics concepts. If you
+want to see full code go to 👉 [`hello-psx/main.c`](../hello-psx/main.c).
 
 The first thing we need are some structs to contain our buffers. We will have a `RenderContext` that contains two
 `RenderBuffers`, and each `RenderBuffer` will contain:
@@ -285,9 +290,9 @@ static RenderContext ctx = { 0 };
 ```
 
 Every frame we will invert the `bufferID` which means we can seamlessly work on one frame whilst the other is being
-displayed. A key detail is that the `p_primtive` is constantly kept pointed at the next byte in the current
-`primitivesBuffer`. It is imperative this is incremented every time a primitive is allocated, and reset at the end
-of every frame.
+displayed. A key detail is that the `p_primitive` is constantly kept pointed at the next byte in the current
+`primitivesBuffer`. It is **imperative** that this is incremented every time a primitive is allocated and reset at the 
+end of every frame.
 
 Like all C programs we need a `main`. The actual arguments are not populated with anything useful but PSX toolchains are
 picky about the signature here:
@@ -297,7 +302,7 @@ int main(int argc, const char **argv) { ... }
 ```
 
 Pretty much before anything we need to set up our display and draw environments, in reverse configuration (so that
-DISP_ENV_1 uses the same VRAM as DRAW_ENV_0, and vice versa)
+`DISP_ENV_1` uses the same VRAM as `DRAW_ENV_0`, and vice versa)
 
 ```c
 SetDefDispEnv(DISP_ENV_0, 0, 0,   320, 240);
@@ -369,7 +374,7 @@ addPrim(ordering_table[buffer_id] + z, p_primitive);
 ctx.p_primitive += sizeof(TILE);
 ```
 
-We just inserted an orange rectangle! Try to contain your excitement.
+We just inserted a yellow square! 🟨 Try to contain your excitement.
 
 ## Back to the project
 
@@ -379,22 +384,43 @@ benefit. A working program was a positive step but not a real game.
 
 ![Hello PSX game](hello-psx.png)
 
-It was time to get real.
+It was time to _get real_.
 
-### Making a UI
+### Displaying text
 
-I had all key pieces prototyped. now I just needed to combine them to implement my tetris clone
+Any Tetris game needs to show the score.
 
-first step is the text and overall UI. this had been easy in SDL where I could just load in a front. the psx would be
-much more hands on
+The PSX doesn't really give you much in the way of text rendering. There is a debug font (shown above) but it's extremely
+basic - for development and not much else.
 
-there is a debug font, but it's not very good. instead I created a texture using the TIM format and timtool. a few
-details about this
+Instead, we need to create a font texture, and use that to skin quads. I created a monospace font with https://www.piskelapp.com/
+and exported that as PNG:
 
-(Picture)
+![Font](../psx/font8.png)
 
-I also wanted a 'frame' for the play pieces to fall into. I wanted this to be more colourful than a plain white square
-the psx supports nice color gradients. I made each corner the colour of a face button
+PSX textures are stored in a format called TIM. Each TIM file comprises:
+
+- a raster image (uncompressed) in 4, 8, 16 or 24 bits per pixel
+- a colour lookup table (CLUT) that acts like the texture's palette
+- coordinates for loading into VRAM
+
+Because the VRAM location is 'baked into' the TIM, and overlapping TIMs will break, you need a tool to both convert input
+images and manage your texture locations. I recommend https://github.com/Lameguy64/TIMedit for this.
+
+Then for each letter we need to:
+
+- send a graphics command to set the GPU "texture page"
+- send a GPU sprite command with the UVs set to draw the right letter
+
+### The play frame
+
+Most Tetris clones us a boring white rectangle for this, but I wanted something that felt more... PlayStation.
+
+The PSX is good at colour gradients, so I chose some vaguely PlayStation-inspired shades to give the UI some interest:
+
+![Midpoint](midpoint.png)
+
+### Tetronimos (Notronimos?)
 
 (Picture)
 
@@ -424,13 +450,9 @@ fixing
 
 ### Porting the logic
 
-I had the graphics and io, what about the logic
-this was very easy to port. able to use a modern compiler with the same pragmas. not using vlas etc
+main problem is lack of a random
 
-insight: says a lot about C's portability
-
-one difference to know, is there is no malloc. psx malloc is broken. not much impact for me, as I'd deliberately
-avoided dynamic memory
+### A title screen
 
 ### Adding the SCEA logo
 
