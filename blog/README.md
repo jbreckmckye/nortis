@@ -404,53 +404,73 @@ PSX textures are stored in a format called TIM. Each TIM file comprises:
 - a colour lookup table (CLUT) that acts like the texture's palette
 - coordinates for loading into VRAM
 
-Because the VRAM location is 'baked into' the TIM, and overlapping TIMs will break, you need a tool to both convert input
+Because the VRAM location of the texture is 'baked into' the TIM file, you need a tool to both convert input
 images and manage your texture locations. I recommend https://github.com/Lameguy64/TIMedit for this.
 
-Then for each letter we need to:
-
-- send a graphics command to set the GPU "texture page"
-- send a GPU sprite command with the UVs set to draw the right letter
+From there we just have a function to skin a bunch of quads, with the UV offsets based on each ASCII value.
 
 ### The play frame
 
-Most Tetris clones us a boring white rectangle for this, but I wanted something that felt more... PlayStation.
-
-The PSX is good at colour gradients, so I chose some vaguely PlayStation-inspired shades to give the UI some interest:
+We need a space for the pieces to fit into. It would be easy to use a boring white rectangle for this, but I wanted
+something that felt more... PlayStation
 
 ![Midpoint](midpoint.png)
 
+Our user interface is coming together. What about the pieces?
+
 ### Tetronimos (Notronimos?)
 
-(Picture)
+Tetris is called Tetris because each piece is made of four bricks, and `tetra` is four in Greek. Ideally each brick
+should be visually distinct with sharp, shaded edges. We do this with two triangles and a quad:
 
-I then started drawing the Tetronimos. These are made of multiple triangles and a quad. On an upscaling emulator they
-look great. The actual rotations are hardcoded, where I treat 16 bit uints like a grid of 4x4 pixels. Then 4 uints 
-encode all the rotations
+![Notronimos](notronimos.png)
 
-on an upscaling emulator they look fantastic
+At native resolution the effect is less clear, but it still feels nice and chunky:
 
-(Picture, 1x resolution and 4x resolution)
+![Native resolution](notronimos-1x.png)
 
-### Something breaks
+In the first prototype of my game I implemented a full naive rotation system, that would actually flip the block 90
+degrees on a centre point. It turns out that isn't actually a very good system, because it causes the blocks to
+'wobble', shifting up and down as they rotate:
 
-Testing tetronimos... black screen
+![Wobble wobble](wobble.png)
 
-(Picture)
+Instead, the rotations are hardcoded to be 'nice' instead of geometrically accurate. A Tetronimo is a grid of 4x4 and
+each cell can be filled or unfilled. There are 4 rotations. Therefore: rotations can just be arrays of four 16-bit 
+numbers:
 
-Break down the problem - only when drawing many tetronimos
-hunch: could this be to do with the primitives buffer?
+```c
+typedef int16_t ShapeBits;
 
-(visualise how this would fail)
+static ShapeBits shapeHexes[8][4] = {
+  { 0 },                              // NONE
+  { 0x0F00, 0x4444, 0x0F00, 0x4444 }, // I
+  { 0xE200, 0x44C0, 0x8E00, 0xC880 }, // J
+  { 0xE800, 0xC440, 0x2E00, 0x88C0 }, // L
+  { 0xCC00, 0xCC00, 0xCC00, 0xCC00 }, // O
+  { 0x6C00, 0x8C40, 0x6C00, 0x8C40 }, // S
+  { 0x0E40, 0x4C40, 0x4E00, 0x4640 }, // T
+  { 0x4C80, 0xC600, 0x4C80, 0xC600 }, // Z
+};
+```
 
-testing with printfs
-fixing
+Extracting the cell values is just a case of simple bit masking:
 
-(picture)
+```c
+#define GRID_BIT_OFFSET 0x8000;
+
+int blocks_getShapeBit(ShapeBits s, int y, int x) {
+  int mask = GRID_BIT_OFFSET >> ((y * 4) + x);
+  return s & mask;
+}
+```
+
+Things are coming together.
 
 ### Porting the logic
 
 main problem is lack of a random
+use time based instead, title screen
 
 ### A title screen
 
@@ -478,4 +498,8 @@ burning PSX games is quite tricky these days. oxides, reflectivity, drives. It t
 grey playstation finally booting a backup disc. The only way I could get the console to play my games was if I held it
 on its side. Good enough
 
-...
+<div align="center" style="position: relative">
+      <a href="https://www.youtube.com/watch?v=oNlyFrWR-t0">
+         <img src="https://img.youtube.com/vi/oNlyFrWR-t0/0.jpg">
+      </a>
+</div>
