@@ -3,10 +3,12 @@
 Notris is a modern homebrew PSX game written in C using modern tooling. It's fully playable on original hardware and is
 powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
-(picture)
+![img.png](img.png)
 
 - [Skip the introduction, go to the technical stuff](#hello-psx)
 - [Skip the technical stuff, read about the project](#back-to-the-project)
+- [Skip all that, I want to see this thing running](#the-moment-of-truth)
+- [I don't care about the project, I want to read the code](../psx/main.c)
 
 ## Why write a PSX game in 2024?
 
@@ -425,19 +427,19 @@ should be visually distinct with sharp, shaded edges. We do this with two triang
 
 ![Notronimos](notronimos.png)
 
-At native resolution the effect is less clear, but it still feels nice and chunky:
+At 1x native resolution the effect would be less clear, but it still looks nice and chunky:
 
 ![Native resolution](notronimos-1x.png)
 
 In the first prototype of my game I implemented a full naive rotation system, that would actually flip the block 90
-degrees on a centre point. It turns out that isn't actually a very good system, because it causes the blocks to
+degrees on a centre point. It turns out that isn't actually a great approach, because it causes the blocks to
 'wobble', shifting up and down as they rotate:
 
 ![Wobble wobble](wobble.png)
 
-Instead, the rotations are hardcoded to be 'nice' instead of geometrically accurate. A Tetronimo is a grid of 4x4 and
+Instead, the rotations are hardcoded to be 'nice' instead of 'accurate'. A Tetronimo is a grid of 4x4 cells, and
 each cell can be filled or unfilled. There are 4 rotations. Therefore: rotations can just be arrays of four 16-bit 
-numbers:
+numbers. Which looks like this:
 
 ```c
 typedef int16_t ShapeBits;
@@ -465,7 +467,7 @@ int blocks_getShapeBit(ShapeBits s, int y, int x) {
 }
 ```
 
-Things are coming together.
+Things are coming together now. Faster and faster.
 
 ### Porting the logic
 
@@ -490,16 +492,38 @@ What would happen on an actual console?
 
 ## The moment of truth
 
-this started with the yaroze purchase, but I wouldn't actually be playing this on yaroze
-I wanted to actually compile a full, retail-equivalent playstation game, and run it on a grey console
-Having lost my original PSX many years ago I scoured eBay for a model with the ability to play backup discs
+This all started with an impulse purchase, my black Yaroze PlayStation. Ironically it wouldn't actually be playing my 
+game as it still possessed its anti-piracy hardware. I didn't fancy installing a modchip on such a priceless piece of 
+PSX history - not with my soldering skills.
 
-burning PSX games is quite tricky these days. oxides, reflectivity, drives. It took some jiggery pokery to get my 
-grey playstation finally booting a backup disc. The only way I could get the console to play my games was if I held it
-on its side. Good enough
+Instead I had to track down a modded grey PlayStation, one that still had a decent drive. I figured that the point of 
+my project was to write a _real_ PlayStation game and that meant using a _real_ PlayStation.
+
+I also had to find the right media. The PSX laser is quite picky and modern CD-Rs tend to be much less reflective than
+pressed discs. My first attempts with grocery story CDs were a waste of time, and I created a lot of coasters. This was
+a low point for me: I'd gotten so far, but what if I simply couldn't burn a working disc?
+
+Finally after many weeks I got my hands on some `JVC Taiyo Yuden` stock which I think had been intended for some kind
+of industrial or factory system. They would find a new purpose with me. I burned the first disc and expected the worst.
+The moment of truth:
 
 <div align="center" style="position: relative">
       <a href="https://www.youtube.com/watch?v=oNlyFrWR-t0">
          <img src="https://img.youtube.com/vi/oNlyFrWR-t0/0.jpg">
       </a>
 </div>
+
+The PlayStation boot sequence boomed from my tiny monitor speakers and the classic "PS" SCEA logo splashed across 
+the screen - 640 by 480 in full vibrant colour. The BIOS had clearly found _something_ on that disc. But the screen fell
+black and I strained my ears for the telltale click-click-click of a drive error.
+
+Instead, one by one, little coloured squares began to blink in from the darkness. Line by line they spelled out a word:
+`NOTRIS`. Then: `PRESS START TO BEGIN`. The text beckoned at me. What would happen next?
+
+A game of Tetris, of course. Why was I surprised? **Writing your own PlayStation game in C is actually very simple: all 
+it requires is to make no mistakes whatsoever**. That is computing for you, especially the low level stuff. It is hard,
+and sharp, and it is beautiful.
+
+Those of us who love computers need to have something slightly wrong with us, an irrationality to our rationality, a 
+way to deny all the evidence of our eyes and ears that the hostile box of silicon is dead and unyielding. And fashion by 
+cunning machinery the illusion that it lives.
