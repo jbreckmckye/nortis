@@ -5,11 +5,6 @@ powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 ![img.png](img.png)
 
-- [Skip the introduction, go to the technical stuff](#hello-psx)
-- [Skip the technical stuff, read about the project](#back-to-the-project)
-- [Skip all that, I want to see this thing running](#the-moment-of-truth)
-- [I don't care about the project, I want to read the code](../psx/main.c)
-
 ## Why write a PSX game in 2024?
 
 Last year I got my hands on a rare, black PlayStation 1. This is called a Net Yaroze and is a special console that can
@@ -31,6 +26,8 @@ This is about how I wrote a simple homebrew PSX game myself, using an open-sourc
 running on original hardware and written in classic C.
 
 ## PlayStation development in the 1990s
+
+[Skip this section](#writing-my-own-psx-game)
 
 PSX games were typically written in C on Windows 9X workstations. The official devkit was a pair of ISA expansion cards
 that slotted into a common IBM PC motherboard and contained the entire PSX system chipset, video out, and extra RAM (8mb
@@ -70,6 +67,8 @@ this [here](https://youtu.be/S-8PVydb9CM?si=oU0Rqy6bsd0EVq_F)).
 (_For further reading take a look at https://www.retroreversing.com/official-playStation-devkit_)
 
 ## Writing my own PSX game
+
+[Skip this section](#a-primer-on-psx-graphics)
 
 But I came to this from a very different perspective: a software engineer in 2024 who mostly worked on web applications.
 My professional experience had almost exclusively been in high level languages like JavaScript and Haskell; I'd done a
@@ -147,6 +146,8 @@ If me using a non-authentic SDK offends the PSX purist in you, feel free to quit
 My first task was a kind of hello world: two squares on a coloured background. Sounds simple, right?
 
 ## A primer on PSX graphics
+
+[Skip this section](#show-me-some-code)
 
 (*Some of this is simplified. For a more authoritative guide read the [PSNoobSDK tutorial](http://lameguy64.net/tutorials/pstutorials/chapter1/1-display.html))
 
@@ -258,10 +259,14 @@ the PSX's distinctive charm.
 
 ## Show me some code!
 
+[Skip this section](#back-to-the-project)
+
 We've talked a lot of theory - what does this look like in practice?
 
 This section won't go through all the code line-by-line but should give you a taster for PSX graphics concepts. If you
 want to see full code go to 👉 [`hello-psx/main.c`](../hello-psx/main.c).
+
+Alternatively if you're not a coder, feel free to skip ahead. This is just for techies who are curious.
 
 The first thing we need are some structs to contain our buffers. We will have a `RenderContext` that contains two
 `RenderBuffers`, and each `RenderBuffer` will contain:
@@ -296,27 +301,19 @@ displayed. A key detail is that the `p_primitive` is constantly kept pointed at 
 `primitivesBuffer`. It is **imperative** that this is incremented every time a primitive is allocated and reset at the 
 end of every frame.
 
-Like all C programs we need a `main`. The actual arguments are not populated with anything useful but PSX toolchains are
-picky about the signature here:
+Pretty much before anything we need to set up our display and draw environments, in reverse configuration so that
+`DISP_ENV_1` uses the same VRAM as `DRAW_ENV_0`, and vice versa
 
 ```c
-int main(int argc, const char **argv) { ... }
-```
-
-Pretty much before anything we need to set up our display and draw environments, in reverse configuration (so that
-`DISP_ENV_1` uses the same VRAM as `DRAW_ENV_0`, and vice versa)
-
-```c
+//                        x  y   width height
 SetDefDispEnv(DISP_ENV_0, 0, 0,   320, 240);
 SetDefDispEnv(DISP_ENV_1, 0, 240, 320, 240);
 
 SetDefDrawEnv(DRAW_ENV_0, 0, 240, 320, 240);
 SetDefDrawEnv(DRAW_ENV_1, 0, 0,   320, 240);
-
-SetDispMask(1);
 ```
 
-I am being quite condensed here - and skipping a few steps - but from here every frame basically looks like
+I am being quite condensed here - but from here every frame basically goes like
 
 ```c
 while (1) {
@@ -379,6 +376,8 @@ ctx.p_primitive += sizeof(TILE);
 We just inserted a yellow square! 🟨 Try to contain your excitement.
 
 ## Back to the project
+
+[Skip this section](#the-moment-of-truth)
 
 At this point in my journey all I really had was a "hello world" demo program, with basic graphics and controller input.
 You can see from the code in [`hello-psx`](../hello-psx) that I was documenting as much as possible, really for my own
@@ -503,10 +502,10 @@ I also had to find the right media. The PSX laser is quite picky and modern CD-R
 pressed discs. My first attempts with grocery story CDs were a waste of time, and I created a lot of coasters. This was
 a low point for me: I'd gotten so far, but what if I simply couldn't burn a working disc?
 
-Finally after many weeks I got my hands on some `JVC Taiyo Yuden` stock which I think had been intended for some kind
-of industrial or factory system. They would find a new purpose with me. I burned the first disc and expected the worst.
-The moment of truth:
+Finally after several weeks I got my hands on some JVC discs which I think had been intended for industrial use. They 
+would find a new purpose with me. I burned the first disc and expected the worst. The moment of truth:
 
+[View on Youtube:](https://www.youtube.com/watch?v=oNlyFrWR-t0)
 <div align="center" style="position: relative">
       <a href="https://www.youtube.com/watch?v=oNlyFrWR-t0">
          <img src="https://img.youtube.com/vi/oNlyFrWR-t0/0.jpg">
@@ -515,14 +514,14 @@ The moment of truth:
 
 The PlayStation boot sequence boomed from my tiny monitor speakers and the classic "PS" SCEA logo splashed across 
 the screen - 640 by 480 in full vibrant colour. The BIOS had clearly found _something_ on that disc. But the screen fell
-black and I strained my ears for the telltale click-click-click of a drive error.
+black and I strained my ears for the telltale _click-click-click_ of a drive error.
 
 Instead, one by one, little coloured squares began to blink in from the darkness. Line by line they spelled out a word:
 `NOTRIS`. Then: `PRESS START TO BEGIN`. The text beckoned at me. What would happen next?
 
 A game of Tetris, of course. Why was I surprised? **Writing your own PlayStation game in C is actually very simple: all 
 it requires is to make no mistakes whatsoever**. That is computing for you, especially the low level stuff. It is hard,
-and sharp, and it is beautiful.
+and sharp, and it is beautiful. Modern computing has softer edges but the essentials haven't changed.
 
 Those of us who love computers need to have something slightly wrong with us, an irrationality to our rationality, a 
 way to deny all the evidence of our eyes and ears that the hostile box of silicon is dead and unyielding. And fashion by 
