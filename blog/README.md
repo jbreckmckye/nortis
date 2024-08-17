@@ -1,6 +1,6 @@
 # Notris: a Tetris clone for the PlayStation 1
 
-Notris is a modern homebrew PSX game written in C using modern tooling. It's fully playable on original hardware and is
+Notris is a homebrew PSX game, written in C using modern tooling. It's fully playable on original hardware and is
 powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 ![img.png](img.png)
@@ -20,7 +20,7 @@ be played on other Yarozes or on [special demo discs](https://www.breck-mckye.co
 fit entirely within system RAM without access to the CD-ROM. Despite these limitations, the Yaroze fostered a passionate
 community of indie developers.
 
-And now I had my own. It got me thinking: what was it actually like, to write a PlayStation game?
+And now I had my own. Which got me thinking: what was it actually like, to write a PlayStation game?
 
 This is about how I wrote a simple homebrew PSX game myself, using an open-source version of the libraries but still
 running on original hardware and written in classic C.
@@ -68,7 +68,7 @@ this [here](https://youtu.be/S-8PVydb9CM?si=oU0Rqy6bsd0EVq_F)).
 
 ## Writing my own PSX game
 
-[Skip this section](#a-primer-on-psx-graphics)
+[Skip this section](#hello-psx)
 
 But I came to this from a very different perspective: a software engineer in 2024 who mostly worked on web applications.
 My professional experience had almost exclusively been in high level languages like JavaScript and Haskell; I'd done a
@@ -79,9 +79,9 @@ way it had been done back in the 90s. So it would be modern toolchains and open 
 through.
 
 The game needed to be something 2D that could be prototyped in a couple of days. I settled for a Tetris clone - I 
-figured that would be complex _enough_ to experience what I wanted to experience.
+figured that would be complex _enough_ to experience what I wanted to.
 
-## Prototyping in JavaScript
+### Prototyping in JavaScript
 
 The first step was to build a prototype in a familiar technology. This would allow me to nail down the basic design,
 then the logic could be translated piecemeal into C.
@@ -97,7 +97,7 @@ At the same time, I was wary that more high-level JavaScript features would be d
 classes or closures would need to be completely rewritten, so I was careful to restrict myself to a simple, procedural
 subset of the language.
 
-## Learning C!
+### Learning C!
 
 Now, I actually had an ulterior motive taking on this project: it was an excuse to finally learn C. The language loomed
 large in my mind and I'd begun to develop an inferiority complex over not knowing it.
@@ -136,10 +136,11 @@ The biggest issue with Psy-Q is that it's still Sony proprietary code, even 30 y
 with it is at risk. That is what sunk the [Portal64](https://github.com/Valkirie/portal64) demake: it statically linked `libultra`, which is Nintendo's
 proprietary N64 SDK.
 
-But to be honest, the main reason I chose [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK) was that it's very well documented and simple to set up. The
-API is _very_ similar to Psy-Q: for many functions I could just consult the printed references that came with my Yaroze.
+But to be honest, the main reason I chose [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK) was that it's very well 
+documented and simple to set up. The API is _very_ similar to Psy-Q: in fact for many functions I could just consult the
+printed references that came with my Yaroze.
 
-If me using a non-authentic SDK offends the PSX purist in you, feel free to quit reading in disgust.
+If me using a non-authentic SDK offends the PSX purist in you, feel free to quit reading now in disgust.
 
 ![PSNoobSDK](psnoob.png)
 
@@ -171,7 +172,8 @@ by things like the PSX startup logo, which doesn't need much animation)
 
 The buffers (referred to alternately as display and draw environments) are swapped every frame. Most PSX games target 
 30fps (in North America) but the actual VSync interrupt comes at 60hz. Some games manage to run at full 60 fps - Tekken
-3 and Kula World (Roll Away) come to mind - but obviously then you need to render in half the time.
+3 and Kula World (Roll Away) come to mind - but obviously then you need to render in half the time. Remember we only
+have 33 Mhz of processing power.
 
 ### Shapes to screen
 
@@ -237,7 +239,8 @@ drawing frame 3.
 ### Ordering tables and z-indexes
 
 As mentioned, the GPU is a completely 2D piece of hardware, it doesn't know about z-coordinates in 3D space. There is no
-"z-buffer" to describe occlusions - i.e. which objects are in front of others. So how are items sorted in front of others?
+"z-buffer" to describe occlusions - i.e. which objects are in front of others. So how are items sorted in front of 
+others?
 
 The way it works is that the ordering table comprises a reverse-linked chain of graphics commands. These are traversed
 back-to-front to implement the **painter's algorithm**.
@@ -248,8 +251,7 @@ To be precise, the ordering table is a reverse-linked list. Each item has a poin
 and we add primitives by inserting them into the chain. Generally OTs are initialised as a fixed array, with each
 element in the array representing a 'level' or layer in the display. OTs can be nested for implementing complex scenes.
 
-The following diagram helps 
-explain it ([source](https://psx.arthus.net/sdk/Psy-Q/DOCS/TECHNOTE/ordtbl.pdf))
+The following diagram helps explain it ([source](https://psx.arthus.net/sdk/Psy-Q/DOCS/TECHNOTE/ordtbl.pdf))
 
 ![Ordering table](ordering-table.png)
 
@@ -377,7 +379,7 @@ We just inserted a yellow square! 🟨 Try to contain your excitement.
 
 ## Back to the project
 
-[Skip this section](#the-moment-of-truth)
+[Skip this section](#building-and-running)
 
 At this point in my journey all I really had was a "hello world" demo program, with basic graphics and controller input.
 You can see from the code in [`hello-psx`](../hello-psx) that I was documenting as much as possible, really for my own
@@ -395,9 +397,9 @@ The PSX doesn't really give you much in the way of text rendering. There is a de
 basic - for development and not much else.
 
 Instead, we need to create a font texture, and use that to skin quads. I created a monospace font with https://www.piskelapp.com/
-and exported that as PNG:
+and exported that as a transparent PNG:
 
-![Font](../psx/font8.png)
+![Font](./font.png)
 
 PSX textures are stored in a format called TIM. Each TIM file comprises:
 
@@ -466,14 +468,59 @@ int blocks_getShapeBit(ShapeBits s, int y, int x) {
 }
 ```
 
-Things are coming together now. Faster and faster.
-
-### Porting the logic
-
-main problem is lack of a random
-use time based instead, title screen
+Things are coming together now with momentum.
 
 ### A title screen
+
+It was at this point I hit a snag: randomisation. Tetronimos have to appear in a random fashion in order for the game to
+be worth playing, but randomisation is hard with computers. On my MacOS version, I was able to 'seed' the random number
+generator with the system clock, but the PSX doesn't have an internal clock.
+
+Instead, a solution many games take is to make the player create the seed. The game displays a splash or title screen with
+text like 'press start to begin', and then the timing is taken from that button press to create the seed.
+
+I created a 'graphic' by declaring some binary-encoded `int32`s where each `1` bit would be a 'pixel' in a row of
+bricks:
+
+!['Notris' spelled out in binary numbers](./title-mask.png)
+
+
+What I wanted was for the lines to gradually dissolve into view. First I needed a function that would effectively 'keep
+track' of how many times it was called. C makes this easy with the `static` keyword - if used inside a function, the same
+memory address and contents are re-used on the next invocation.
+
+Then inside this same function is a loop that goes through the x/y values of the 'grid', and decides whether enough
+ticks have happened to show the 'pixel':
+
+```c
+void ui_renderTitleScreen() {
+  static int32_t titleTimer = 0;
+  titleTimer++;
+  
+  // For every 2 times (2 frames) this function is called, ticks increases by 1
+  int32_t ticks = titleTimer / 2;
+  
+  // Dissolve-in the title blocks
+  for (int y = 0; y < 5; y++) {
+    for (int x = 0; x < 22; x++) {
+      int matrixPosition = (y * 22) + x;
+      if (matrixPosition > ticks) {
+        break; // because this 'pixel' of the display is not to be displayed yet
+      }
+    
+      int32_t titleLine = titlePattern[y];
+      int32_t bitMask = titleMask >> x;
+      if (titleLine & bitMask) { // there is a 'pixel' at this location to show
+        ui_renderBlock( /* skip boring details */);
+      }
+    }
+  }
+}
+```
+
+I was very pleased with the effect. We're _almost_ there now.
+
+![Title](title.png)
 
 ### Adding the SCEA logo
 
