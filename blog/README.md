@@ -518,23 +518,29 @@ void ui_renderTitleScreen() {
 }
 ```
 
-I was very pleased with the effect. We're _almost_ there now.
+We're _almost_ there now.
 
 ![Title](title.png)
 
 ### Adding the SCEA logo
 
-license data
+Classic PSX games boot in two stages: first the Sony Computer Entertainment screen, then the PSX logo. But if we compile
+and run the `hello-psx` project it doesn't. The second screen is just black. Why is that?
 
-(Picture)
+![startup.png](./startup.png)
 
-## Building and running
+Well, the SCE splash comes from the BIOS, as does the PSX boot sound, but the famous logo is actually part of the disc 
+license data. It's there to act like a 'seal of authenticity' - so anyone pirating a game is copying _Sony's_ IP as well
+as the publisher's. This gave Sony more legal instruments to crack down on software piracy.
 
-runs on emulator, 60fps even with speed restrictions. looks great with upscaling on
+If we want our game to show the logo, we need to provide a license file of our own, but for the sake of copyright we have
+to `.gitignore` it. 
 
-(Picture)
+```xml
+<license file="${PROJECT_SOURCE_DIR}/license_data.dat" />
+```
 
-What would happen on an actual console?
+Okay. _Now_ we are ready.
 
 ## The moment of truth
 
