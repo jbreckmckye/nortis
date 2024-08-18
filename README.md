@@ -5,6 +5,8 @@ powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 ![img.png](blog/img.png)
 
+View the PSX codebase [here](psx).
+
 ## Why write a PSX game in 2024?
 
 Last year I got my hands on a rare, black PlayStation 1. This is called a Net Yaroze and is a special console that can
@@ -443,6 +445,21 @@ each cell can be filled or unfilled. There are 4 rotations. Therefore: rotations
 numbers. Which looks like this:
 
 ```c
+/**
+ * Example: T block
+ *
+ * As a grid:
+ *
+ * .X.. -> 0100
+ * XXX. -> 1110
+ * .... -> 0000
+ * .... -> 0000
+ * 
+ * binary      = 0b0100111000000000
+ * hexadecimal = 0x4E00
+ * 
+ */
+
 typedef int16_t ShapeBits;
 
 static ShapeBits shapeHexes[8][4] = {
@@ -533,8 +550,8 @@ Well, the SCE splash comes from the BIOS, as does the PSX boot sound, but the fa
 license data. It's there to act like a 'seal of authenticity' - so anyone pirating a game is copying _Sony's_ IP as well
 as the publisher's. This gave Sony more legal instruments to crack down on software piracy.
 
-If we want our game to show the logo, we need to provide a license file of our own, but for the sake of copyright we have
-to `.gitignore` it. 
+If we want _our_ game to show the logo, we need to provide a license file extracted from an ISO, but for the sake of 
+copyright we have to `.gitignore` it. 
 
 ```xml
 <license file="${PROJECT_SOURCE_DIR}/license_data.dat" />
@@ -548,26 +565,29 @@ This all started with an impulse purchase, my black Yaroze PlayStation. Ironical
 game as it still possessed its anti-piracy hardware. I didn't fancy installing a modchip on such a priceless piece of 
 PSX history - not with my soldering skills.
 
-Instead I had to track down a modded grey PlayStation, one that still had a decent drive. I figured that the point of 
-my project was to write a _real_ PlayStation game and that meant using a _real_ PlayStation.
+Instead, I had to track down a modded grey PlayStation, one that still had a decent drive. I figured that the point of 
+my project was to write a _true_ PlayStation game and that meant using a _true_ PlayStation.
 
 I also had to find the right media. The PSX laser is quite picky and modern CD-Rs tend to be much less reflective than
-pressed discs. My first attempts with grocery story CDs were a waste of time, and I created a lot of coasters. This was
-a low point for me: I'd gotten so far, but what if I simply couldn't burn a working disc?
+pressed discs. My first attempts with grocery story CDs were a waste of time, and over the space of about two weeks I
+created a lot of coasters.
 
-Finally after several weeks I got my hands on some JVC discs which I think had been intended for industrial use. They 
-would find a new purpose with me. I burned the first disc and expected the worst. The moment of truth:
+This was a dark moment. Had I gotten all this way, only to fail at _burning the CD_?
 
-[View on Youtube:](https://www.youtube.com/watch?v=oNlyFrWR-t0)
+After several weeks I got my hands on some special JVC Taiyo Yuden stock. From what I could read these were quite
+specialist, and typically used in industrial applications. I burned the first disc in the platter and I expected the
+worst.
+
+[This was the moment of truth:](https://www.youtube.com/watch?v=oNlyFrWR-t0)
 <div align="center" style="position: relative">
       <a href="https://www.youtube.com/watch?v=oNlyFrWR-t0">
          <img src="https://img.youtube.com/vi/oNlyFrWR-t0/0.jpg">
       </a>
 </div>
 
-The PlayStation boot sequence boomed from my tiny monitor speakers and the classic "PS" SCEA logo splashed across 
-the screen - 640 by 480 in full vibrant colour. The BIOS had clearly found _something_ on that disc. But the screen fell
-black and I strained my ears for the telltale _click-click-click_ of a drive error.
+The PlayStation boot sequence boomed from my tiny monitor speakers and the classic "PS" logo splashed across the screen
+in vibrant 640-by-480 resolution. The BIOS had clearly found _something_ on that disc, but a lot could fail after this
+point. The screen fell black and I strained my ears for the telltale _click-click-click_ of a drive error.
 
 Instead, one by one, little coloured squares began to blink in from the darkness. Line by line they spelled out a word:
 `NOTRIS`. Then: `PRESS START TO BEGIN`. The text beckoned at me. What would happen next?
