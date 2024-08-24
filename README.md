@@ -1,6 +1,6 @@
 # Nortis: a Tetris clone for the PlayStation 1
 
-Notris is a homebrew PSX game, written in C using modern tooling. It's fully playable on original hardware and is
+Nortis is a homebrew PSX game, written in C using modern tooling. It's fully playable on original hardware and is
 powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
 
 ![img.png](blog/img.png)
@@ -89,7 +89,7 @@ The first step was to build a prototype in a familiar technology. This would all
 then the logic could be translated piecemeal into C.
 
 As a web developer the most obvious technology for prototyping was JavaScript: it's simple, concise, easy to debug, and
-it sports the HTML5 `<canvas>` graphics API. "Notris" came together very quickly
+it sports the HTML5 `<canvas>` graphics API. Things came together very quickly
 
 <p align="center">
   <img src="blog/web.png" width=50% height=50% alt="web version of tetris">
@@ -115,9 +115,9 @@ Despite my fears, I found C incredibly fun. Very quickly it 'clicked' for me. Yo
 structs, chars, functions - and build them up into layers of abstraction to eventually find yourself sat atop an entire 
 working system.
 
-!["Notris" with SDL2](blog/sdl2.png)
+!["Nortis" with SDL2](blog/sdl2.png)
 
-"Notris" only took a couple of days to port, and I was very satisfied with my first true C project. And I hadn't had a
+The game only took a couple of days to port, and I was very satisfied with my first true C project. And I hadn't had a
 single segfault!
 
 SDL had been a pleasure to work with, but there were a few aspects that required me to allocate memory dynamically.
@@ -393,7 +393,7 @@ It was time to _get real_.
 
 ### Displaying text
 
-Any Tetris game needs to show the score.
+Our game needs to show the score.
 
 The PSX doesn't really give you much in the way of text rendering. There is a debug font (shown above) but it's extremely
 basic - for development and not much else.
@@ -425,7 +425,7 @@ Our user interface is coming together. What about the pieces?
 
 ### Tetronimos (Notronimos?)
 
-Tetris is called Tetris because each piece is made of four bricks, and `tetra` is four in Greek. Ideally each brick
+Now comes some important visual design. Ideally each brick
 should be visually distinct with sharp, shaded edges. We do this with two triangles and a quad:
 
 ![Notronimos](blog/notronimos.png)
@@ -440,7 +440,7 @@ degrees on a centre point. It turns out that isn't actually a great approach, be
 
 ![Wobble wobble](blog/rotate.png)
 
-Instead, the rotations are hardcoded to be 'nice' instead of 'accurate'. A Tetronimo is a grid of 4x4 cells, and
+Instead, the rotations are hardcoded to be 'nice' instead of 'accurate'. A Piece is defined within a grid of 4x4 cells, and
 each cell can be filled or unfilled. There are 4 rotations. Therefore: rotations can just be arrays of four 16-bit 
 numbers. Which looks like this:
 
@@ -489,7 +489,7 @@ Things are coming together now with momentum.
 
 ### A title screen
 
-It was at this point I hit a snag: randomisation. Tetronimos have to appear in a random fashion in order for the game to
+It was at this point I hit a snag: randomisation. Pieces have to appear in a random fashion in order for the game to
 be worth playing, but randomisation is hard with computers. On my MacOS version, I was able to 'seed' the random number
 generator with the system clock, but the PSX doesn't have an internal clock.
 
@@ -499,7 +499,7 @@ text like 'press start to begin', and then the timing is taken from that button 
 I created a 'graphic' by declaring some binary-encoded `int32`s where each `1` bit would be a 'pixel' in a row of
 bricks:
 
-!['Notris' spelled out in binary numbers](blog/title-mask.png)
+!['Nortis' spelled out in binary numbers](blog/title-mask.png)
 
 
 What I wanted was for the lines to gradually dissolve into view. First I needed a function that would effectively 'keep
