@@ -1,4 +1,4 @@
-# Notris: a Tetris clone for the PlayStation 1
+# Nortis: a Tetris clone for the PlayStation 1
 
 Notris is a homebrew PSX game, written in C using modern tooling. It's fully playable on original hardware and is
 powered by [PSNoobSDK](https://github.com/Lameguy64/PSn00bSDK).
